@@ -19,4 +19,12 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="Autofac" Version="6.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
+	</ItemGroup>
+
 </Project>
