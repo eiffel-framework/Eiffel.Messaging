@@ -14,7 +14,7 @@ namespace Eiffel.Messaging.Abstractions
         where TPayload : ICommand
         where TRetVal : IEquatable<TRetVal>
     {
-        public abstract Task<TRetVal> HandleAsync(TPayload payload, CancellationToken cancellationToken = default);
+        Task<TRetVal> HandleAsync(TPayload payload, CancellationToken cancellationToken = default);
     }
 
 
@@ -25,6 +25,6 @@ namespace Eiffel.Messaging.Abstractions
     public interface ICommandHandler<in TPayload>
         where TPayload : ICommand
     {
-        public abstract Task HandleAsync(TPayload payload, CancellationToken cancellationToken = default);
+        Task HandleAsync(TPayload payload, CancellationToken cancellationToken = default);
     }
 }
