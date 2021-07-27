@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Eiffel.Messaging.Abstractions
 {
     /// <summary>
-    /// Handles commands, TRetVal must be primitive type if needed
+    /// Handle commands, TRetVal must be primitive type if needed
     /// <seealso cref="CommandHandler{TPayload}"/>
     /// <typeparam name="TPayload">A command object</typeparam>
     /// <typeparamref name="TRetVal">A primitive type</typeparamref>
@@ -14,17 +14,17 @@ namespace Eiffel.Messaging.Abstractions
         where TPayload : ICommand
         where TRetVal : IEquatable<TRetVal>
     {
-        public abstract Task<TRetVal> HandleAsync(TPayload payload, CancellationToken cancellationToken);
+        public abstract Task<TRetVal> HandleAsync(TPayload payload, CancellationToken cancellationToken = default);
     }
 
 
     /// <summary>
-    /// Handles commands
+    /// Handle commands
     /// </summary>
     /// <typeparam name="TPayload">A command object</typeparam>
     public interface ICommandHandler<in TPayload>
         where TPayload : ICommand
     {
-        public abstract Task HandleAsync(TPayload payload, CancellationToken cancellationToken);
+        public abstract Task HandleAsync(TPayload payload, CancellationToken cancellationToken = default);
     }
 }

@@ -9,8 +9,7 @@ namespace Eiffel.Messaging.Abstractions
     /// <summary>
     /// Publish events to message broker or in memory stream
     /// </summary>
-    /// <exception cref="ArgumentNullException">Mediator is null</exception>
-    /// <exception cref="ArgumentNullException">MessageBrokerClient is null</exception>
+    /// <exception cref="ArgumentNullException" />
     public interface IEventBus
     {
         /// <summary>
@@ -24,9 +23,8 @@ namespace Eiffel.Messaging.Abstractions
         /// Publish event asynchronously
         /// </summary>
         /// <typeparam name="TEvent">Domain event</typeparam>
-        /// <param name="event"></param>
         /// <exception cref="OperationCanceledException" />
-        Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken)
+        Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
             where TEvent : class, new();
 
         /// <summary>
@@ -41,7 +39,7 @@ namespace Eiffel.Messaging.Abstractions
         /// </summary>
         /// <typeparam name="TEvent">Domain event</typeparam>
         /// <exception cref="OperationCanceledException" />
-        Task SubscribeAsync<TEvent>(CancellationToken cancellationToken)
+        Task SubscribeAsync<TEvent>(CancellationToken cancellationToken = default)
             where TEvent : class, new();
     }
 }
