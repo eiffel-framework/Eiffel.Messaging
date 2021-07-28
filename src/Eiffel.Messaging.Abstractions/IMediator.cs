@@ -7,7 +7,6 @@ namespace Eiffel.Messaging.Abstractions
     public interface IMediator
     {
         // TODO: where TEvent : DomainEvent
-        // TODo: Implement pipeline
 
         /// <summary>
         /// Publish event to registered event handler

@@ -37,7 +37,7 @@ namespace Eiffel.Messaging
 
             if (handlers == null || !handlers.Any())
             {
-                throw new HandlerNotFoundException($"{payload.GetType().Name} handler could not be resolved");
+                throw new HandlerNotFoundException($"{payload.GetType().Name} event handler could not be found");
             }
 
             var tasks = new List<Task>();
@@ -129,7 +129,15 @@ namespace Eiffel.Messaging
 
             var handler = _lifetimeScope.Resolve(handlerType);
 
-            return (TResult)targetMethod.Invoke(handler, new object[] { payload, cancellationToken });
+            _lifetimeScope.Resolve<IEnumerable<IPipelinePreProcessor>>()?.ToList()?
+                .ForEach(async pre => await pre.ProcessAsync(payload).ConfigureAwait(false));
+
+            var result = (TResult)targetMethod.Invoke(handler, new object[] { payload, cancellationToken });
+
+            _lifetimeScope.Resolve<IEnumerable<IPipelinePostProcessor>>()?.ToList()?
+                .ForEach(async post => await post.ProcessAsync(payload, cancellationToken).ConfigureAwait(false));
+
+            return result;
         }
     }
 }

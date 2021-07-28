@@ -26,6 +26,9 @@ namespace Eiffel.Messaging.Tests
         private readonly MockEvent _mockEvent;
         private readonly Mock<IEventHandler<MockEvent>> _mockEventHandler;
 
+        private readonly Mock<IPipelinePreProcessor> _mockPreProcessor;
+        private readonly Mock<IPipelinePostProcessor> _mockPostProcessor;
+
         public Mediator_Unit_Tests()
         {
             _containerBuilder = new ContainerBuilder();
@@ -45,6 +48,12 @@ namespace Eiffel.Messaging.Tests
             _mockEvent = new MockEvent();
             _mockEventHandler = new Mock<IEventHandler<MockEvent>>();
             _mockEventHandler.Setup(x => x.HandleAsync(It.IsAny<MockEvent>(), It.IsAny<CancellationToken>()));
+
+            _mockPreProcessor = new Mock<IPipelinePreProcessor>();
+            _mockPreProcessor.Setup(x => x.ProcessAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()));
+
+            _mockPostProcessor = new Mock<IPipelinePostProcessor>();
+            _mockPostProcessor.Setup(x => x.ProcessAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()));
 
             _containerBuilder.Register<IMediator>(context =>
             {
@@ -110,7 +119,34 @@ namespace Eiffel.Messaging.Tests
         }
 
         [Fact]
-        public async Task Mediator_Should_Dispatch_Command()
+        public async Task Mediator_Should_Process_Pipelines()
+        {
+            // Arrange
+            _containerBuilder.RegisterInstance(_mockCommandHandler.Object);
+            _containerBuilder.RegisterInstance(_mockQueryHandler.Object);
+            _containerBuilder.RegisterInstance(_mockMessageHandler.Object);
+
+            _containerBuilder.RegisterInstance(_mockPreProcessor.Object);
+            _containerBuilder.RegisterInstance(_mockPostProcessor.Object);
+
+            _mediator = _containerBuilder.Build().Resolve<IMediator>();
+
+            // Act
+            await _mediator.SendAsync(_mockCommand, default);
+            await _mediator.SendAsync(_mockQuery, default);
+            await _mediator.DispatchAsync(_mockMessage, default);
+
+            // Assert
+            _mockCommandHandler.Verify(x => x.HandleAsync(It.IsAny<MockCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockQueryHandler.Verify(x => x.HandleAsync(It.IsAny<MockQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockMessageHandler.Verify(x => x.HandleAsync(It.IsAny<MockMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+
+            _mockPreProcessor.Verify(x => x.ProcessAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+            _mockPostProcessor.Verify(x => x.ProcessAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+        }
+
+        [Fact]
+        public async Task Mediator_Should_Dispatch_Success()
         {
             // Arrange
             _containerBuilder.RegisterInstance(_mockCommandHandler.Object);

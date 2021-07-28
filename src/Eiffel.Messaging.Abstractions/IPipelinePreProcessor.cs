@@ -8,6 +8,6 @@ namespace Eiffel.Messaging.Abstractions
     /// </summary>
     public interface IPipelinePreProcessor
     {
-        Task ProcesAsync(object message, CancellationToken cancellationToken = default);
+        Task ProcessAsync(object message, CancellationToken cancellationToken = default);
     }
 }
