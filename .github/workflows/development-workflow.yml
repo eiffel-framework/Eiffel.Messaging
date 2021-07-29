@@ -18,12 +18,9 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: './${{ github.event.repository.name }}'
       
       - name: Build solution
         run: dotnet build --no-restore
-        working-directory: './${{ github.event.repository.name }}'
       
       - name: Run tests
         run: dotnet test --no-build --no-restore --verbosity normal
-        working-directory: './${{ github.event.repository.name }}'
