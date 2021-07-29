@@ -6,4 +6,13 @@
 
         TMessage Deserialize<TMessage>(byte[] bytes);
     }
+
+    public interface IBinarySerializer
+    {
+        byte[] Serialize<TMessage>(TMessage message)
+            where TMessage : new();
+
+        TMessage Deserialize<TMessage>(byte[] bytes)
+            where TMessage : new();
+    }
 }

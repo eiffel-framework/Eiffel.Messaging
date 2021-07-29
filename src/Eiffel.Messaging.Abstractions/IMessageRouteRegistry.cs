@@ -14,12 +14,7 @@ namespace Eiffel.Messaging.Abstractions
         /// <exception cref="KeyNotFoundException"></exception>
         string GetRoute<TMessage>()
             where TMessage : class;
-
-        /// <summary>
-        /// Registers message(s) for route
-        /// </summary>
-        void Register(Action<Dictionary<string, Type[]>> routes);
-
+        
         /// <summary>
         /// Registers message for route
         /// </summary>
