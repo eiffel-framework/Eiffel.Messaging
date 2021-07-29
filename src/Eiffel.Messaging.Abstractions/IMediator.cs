@@ -13,7 +13,7 @@ namespace Eiffel.Messaging.Abstractions
         /// </summary>
         /// <exception cref="OperationCanceledException"
         Task PublishAsync<TEvent>(TEvent payload, CancellationToken cancellationToken = default)
-            where TEvent : IEvent;
+            where TEvent : class;
 
         /// <summary>
         /// Dispatch message to handler

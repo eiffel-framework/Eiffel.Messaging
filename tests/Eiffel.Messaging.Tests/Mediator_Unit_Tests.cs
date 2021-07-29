@@ -77,16 +77,16 @@ namespace Eiffel.Messaging.Tests
             _mediator = _containerBuilder.Build().Resolve<IMediator>();
 
             // Act
-            Func<Task> act1 = () => _mediator.SendAsync(_mockCommand, tokenSource.Token);
-            Func<Task> act2 = () => _mediator.SendAsync(_mockQuery, tokenSource.Token);
-            Func<Task> act3 = () => _mediator.DispatchAsync(_mockMessage, tokenSource.Token);
-            Func<Task> act4 = () => _mediator.PublishAsync(_mockEvent, tokenSource.Token);
+            Func<Task> sutCommand = () => _mediator.SendAsync(_mockCommand, tokenSource.Token);
+            Func<Task> sutQuery = () => _mediator.SendAsync(_mockQuery, tokenSource.Token);
+            Func<Task> sutMessage = () => _mediator.DispatchAsync(_mockMessage, tokenSource.Token);
+            Func<Task> sutEvent = () => _mediator.PublishAsync(_mockEvent, tokenSource.Token);
 
             // Assert
-            await Assert.ThrowsAsync<OperationCanceledException>(act1);
-            await Assert.ThrowsAsync<OperationCanceledException>(act2);
-            await Assert.ThrowsAsync<OperationCanceledException>(act3);
-            await Assert.ThrowsAsync<OperationCanceledException>(act4);
+            await Assert.ThrowsAsync<OperationCanceledException>(sutCommand);
+            await Assert.ThrowsAsync<OperationCanceledException>(sutQuery);
+            await Assert.ThrowsAsync<OperationCanceledException>(sutMessage);
+            await Assert.ThrowsAsync<OperationCanceledException>(sutEvent);
 
             _mockCommandHandler.Verify(x => x.HandleAsync(It.IsAny<MockCommand>(), It.IsAny<CancellationToken>()), Times.Never);
             _mockQueryHandler.Verify(x => x.HandleAsync(It.IsAny<MockQuery>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -101,16 +101,16 @@ namespace Eiffel.Messaging.Tests
             _mediator = _containerBuilder.Build().Resolve<IMediator>();
 
             // Act
-            Func<Task> act1 = () => _mediator.SendAsync(_mockCommand, default);
-            Func<Task> act2 = () => _mediator.SendAsync(_mockQuery, default);
-            Func<Task> act3 = () => _mediator.DispatchAsync(_mockMessage, default);
-            Func<Task> act4 = () => _mediator.PublishAsync(_mockEvent, default);
+            Func<Task> sutCommand = () => _mediator.SendAsync(_mockCommand, default);
+            Func<Task> sutQuery = () => _mediator.SendAsync(_mockQuery, default);
+            Func<Task> sutMessage = () => _mediator.DispatchAsync(_mockMessage, default);
+            Func<Task> sutEvent = () => _mediator.PublishAsync(_mockEvent, default);
 
             // Assert
-            await Assert.ThrowsAsync<HandlerNotFoundException>(act1);
-            await Assert.ThrowsAsync<HandlerNotFoundException>(act2);
-            await Assert.ThrowsAsync<HandlerNotFoundException>(act3);
-            await Assert.ThrowsAsync<HandlerNotFoundException>(act4);
+            await Assert.ThrowsAsync<HandlerNotFoundException>(sutCommand);
+            await Assert.ThrowsAsync<HandlerNotFoundException>(sutQuery);
+            await Assert.ThrowsAsync<HandlerNotFoundException>(sutMessage);
+            await Assert.ThrowsAsync<HandlerNotFoundException>(sutEvent);
 
             _mockCommandHandler.Verify(x => x.HandleAsync(It.IsAny<MockCommand>(), It.IsAny<CancellationToken>()), Times.Never);
             _mockQueryHandler.Verify(x => x.HandleAsync(It.IsAny<MockQuery>(), It.IsAny<CancellationToken>()), Times.Never);

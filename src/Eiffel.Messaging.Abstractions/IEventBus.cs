@@ -15,31 +15,32 @@ namespace Eiffel.Messaging.Abstractions
         /// <summary>
         /// Publish event synchronically
         /// </summary>
-        /// <typeparam name="TEvent">Domain event</typeparam>
-        void Publish<TEvent>(TEvent @event) 
-            where TEvent : class, new();
+        void Publish<TEvent>(TEvent @event)
+            where TEvent : class;
 
         /// <summary>
         /// Publish event asynchronously
         /// </summary>
-        /// <typeparam name="TEvent">Domain event</typeparam>
         /// <exception cref="OperationCanceledException" />
         Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
-            where TEvent : class, new();
+            where TEvent : class;
 
         /// <summary>
         /// Subscribe event synchronically
         /// </summary>
-        /// <typeparam name="TEvent">Domain event</typeparam>
         void Subscribe<TEvent>()
-            where TEvent : class, new();
+            where TEvent : class;
 
         /// <summary>
         /// Subscribe event synchronically
         /// </summary>
-        /// <typeparam name="TEvent">Domain event</typeparam>
         /// <exception cref="OperationCanceledException" />
         Task SubscribeAsync<TEvent>(CancellationToken cancellationToken = default)
-            where TEvent : class, new();
+            where TEvent : class;
+
+        /// <summary>
+        /// Unsubscribe event bus
+        /// </summary>
+        void Unsubscribe();
     }
 }

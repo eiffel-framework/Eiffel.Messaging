@@ -24,18 +24,18 @@ namespace Eiffel.Messaging
         /// <exception cref="HandlerNotFoundException" />
         /// <exception cref="MissingMethodException" />
         public virtual Task PublishAsync<TEvent>(TEvent payload, CancellationToken cancellationToken = default)
-            where TEvent : IEvent
+            where TEvent : class
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 throw new OperationCanceledException();
             }
 
-            var handlerType = typeof(IEnumerable<IEventHandler<TEvent>>);
+            var handlerType = typeof(IEnumerable<>).MakeGenericType(typeof(IEventHandler<>).MakeGenericType(payload.GetType()));
 
-            var handlers = _lifetimeScope.Resolve(handlerType) as IEnumerable<IEventHandler<TEvent>>;
+            var handlers = _lifetimeScope.Resolve(handlerType) as dynamic;
 
-            if (handlers == null || !handlers.Any())
+            if (handlers == null || handlers?.Length == 0)
             {
                 throw new HandlerNotFoundException($"{payload.GetType().Name} event handler could not be found");
             }
@@ -61,7 +61,7 @@ namespace Eiffel.Messaging
         /// <exception cref="OperationCanceledException" />
         /// <exception cref="HandlerNotFoundException" />
         /// <exception cref="MissingMethodException" />
-        public Task DispatchAsync<TMessage>(TMessage payload, CancellationToken cancellationToken = default) where TMessage : class
+        public virtual Task DispatchAsync<TMessage>(TMessage payload, CancellationToken cancellationToken = default) where TMessage : class
         {
             var handlerType = typeof(IMessageHandler<>).MakeGenericType(payload.GetType());
 
