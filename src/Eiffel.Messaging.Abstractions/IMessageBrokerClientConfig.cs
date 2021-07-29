@@ -6,6 +6,7 @@
     public interface IMessageBrokerClientConfig
     {
         public string Name { get; }
-        bool IsEnabled { get; set; }
+
+        public MessageSerializer MessageSerializer { get; set; }
     }
 }

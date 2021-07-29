@@ -13,22 +13,10 @@ namespace Eiffel.Messaging.Abstractions
     public interface IEventBus
     {
         /// <summary>
-        /// Publish event synchronically
-        /// </summary>
-        void Publish<TEvent>(TEvent @event)
-            where TEvent : class;
-
-        /// <summary>
         /// Publish event asynchronously
         /// </summary>
         /// <exception cref="OperationCanceledException" />
         Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
-            where TEvent : class;
-
-        /// <summary>
-        /// Subscribe event synchronically
-        /// </summary>
-        void Subscribe<TEvent>()
             where TEvent : class;
 
         /// <summary>

@@ -14,24 +14,8 @@ namespace Eiffel.Messaging.Abstractions
         /// <seealso cref="IMessageRouteRegistry"/>
         /// </summary>
         /// <typeparam name="TMessage">Message object</typeparam>
-        void Produce<TMessage>(TMessage message)
-            where TMessage : class;
-
-        /// <summary>
-        /// Sends message to message broker
-        /// <seealso cref="IMessageRouteRegistry"/>
-        /// </summary>
-        /// <typeparam name="TMessage">Message object</typeparam>
         /// <exception cref="OperationCanceledException" />
         Task ProduceAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
-            where TMessage : class;
-
-        /// <summary>
-        /// Comsumes message from message broker
-        /// <seealso cref="IMessageRouteRegistry"/>
-        /// </summary>
-        /// <typeparam name="TMessage">Message object</typeparam>
-        void Consume<TMessage>(Action<TMessage> dispatcher)
             where TMessage : class;
 
         /// <summary>

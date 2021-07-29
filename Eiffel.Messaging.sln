@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eiffel.Messaging.Abstractio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eiffel.Messaging.Tests", "tests\Eiffel.Messaging.Tests\Eiffel.Messaging.Tests.csproj", "{6D27F366-E444-4748-83AC-42A5820DF821}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eiffel.Messaging", "src\Eiffel.Messaging\Eiffel.Messaging.csproj", "{31584BD0-D9AF-45E4-8D46-C89FDA577AFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eiffel.Messaging", "src\Eiffel.Messaging\Eiffel.Messaging.csproj", "{31584BD0-D9AF-45E4-8D46-C89FDA577AFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eiffel.Messaging.Kafka", "src\Eiffel.Messaging.Kafka\Eiffel.Messaging.Kafka.csproj", "{111F1EE5-4953-46FD-9D1E-4094B72E3D9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{31584BD0-D9AF-45E4-8D46-C89FDA577AFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31584BD0-D9AF-45E4-8D46-C89FDA577AFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31584BD0-D9AF-45E4-8D46-C89FDA577AFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{111F1EE5-4953-46FD-9D1E-4094B72E3D9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{111F1EE5-4953-46FD-9D1E-4094B72E3D9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{111F1EE5-4953-46FD-9D1E-4094B72E3D9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{111F1EE5-4953-46FD-9D1E-4094B72E3D9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,6 +47,7 @@ Global
 		{91351A2C-5133-4C99-9B1B-D7301D360BE6} = {E61BB965-09EE-4D03-B734-D65C02AB7AC7}
 		{6D27F366-E444-4748-83AC-42A5820DF821} = {EE51B426-E918-4337-AB1E-4C8C78F75A28}
 		{31584BD0-D9AF-45E4-8D46-C89FDA577AFC} = {E61BB965-09EE-4D03-B734-D65C02AB7AC7}
+		{111F1EE5-4953-46FD-9D1E-4094B72E3D9D} = {E61BB965-09EE-4D03-B734-D65C02AB7AC7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {298F5AE4-E289-489E-85DC-68CD8B17EB92}

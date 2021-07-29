@@ -22,15 +22,6 @@ namespace Eiffel.Messaging
         }
 
         /// <summary>
-        /// Publish event synchronically
-        /// </summary>
-        public virtual void Publish<TEvent>(TEvent @event) 
-            where TEvent : class
-        {
-            _client.Produce(@event);
-        }
-
-        /// <summary>
         /// Publish event asynchronously
         /// </summary>
         /// <exception cref="OperationCanceledException" />
@@ -38,18 +29,6 @@ namespace Eiffel.Messaging
             where TEvent : class
         {
             return _client.ProduceAsync(@event, cancellationToken);
-        }
-
-        /// <summary>
-        /// Subscribe event synchronically
-        /// </summary>
-        public virtual void Subscribe<TEvent>() 
-            where TEvent : class
-        {
-            _client.Consume(async (TEvent @event) =>
-            {
-                await _mediator.PublishAsync(@event);
-            });
         }
 
         /// <summary>

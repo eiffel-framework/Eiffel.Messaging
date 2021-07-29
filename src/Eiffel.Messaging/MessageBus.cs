@@ -17,15 +17,6 @@ namespace Eiffel.Messaging
         }
 
         /// <summary>
-        /// Send message
-        /// </summary>
-        public void Send<TMessage>(TMessage message) 
-            where TMessage : class
-        {
-            _client.Produce(message);
-        }
-
-        /// <summary>
         /// Send message 
         /// </summary>
         /// <exception cref="OperationCanceledException" />
@@ -33,18 +24,6 @@ namespace Eiffel.Messaging
             where TMessage : class
         {
             return _client.ProduceAsync(message, cancellationToken);
-        }
-
-        /// <summary>
-        /// Subscribe message
-        /// </summary>
-        public void Subscribe<TMessage>()
-            where TMessage : class
-        {
-            _client.Consume<TMessage>(async (message) =>
-            {
-                await _mediator.DispatchAsync(message, default);
-            });
         }
 
         /// <summary>

@@ -10,22 +10,10 @@ namespace Eiffel.Messaging.Abstractions
     public interface IMessageBus
     {
         /// <summary>
-        /// Send message
-        /// </summary>
-        void Send<TMessage>(TMessage message)
-           where TMessage : class;
-
-        /// <summary>
         /// Send message 
         /// </summary>
         /// <exception cref="OperationCanceledException" />
         Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
-            where TMessage : class;
-
-        /// <summary>
-        /// Subscribe topic which message registered on IMessageRouteRegistry
-        /// </summary>
-        void Subscribe<TMessage>()
             where TMessage : class;
 
         /// <summary>

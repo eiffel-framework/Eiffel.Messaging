@@ -25,21 +25,7 @@ namespace Eiffel.Messaging.Tests
         }
 
         [Fact]
-        public void EventBus_Should_Send_Message()
-        {
-            // Arrange
-            var mockMessage = new MockMessage();
-            _mockClient.Setup(x => x.Produce(It.IsAny<object>()));
-
-            // Act
-            _messageBus.Send(mockMessage);
-
-            // Assert
-            _mockClient.Verify(x => x.Produce(It.IsAny<object>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task EventBus_Should_Send_Message_Async()
+        public async Task EventBus_Should_Send_Message()
         {
             // Arrange
             var mockMessage = new MockMessage();
@@ -52,21 +38,9 @@ namespace Eiffel.Messaging.Tests
             _mockClient.Verify(x => x.ProduceAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        [Fact]
-        public void EventBus_Should_Consume_Message()
-        {
-            // Arrange
-            _mockClient.Setup(x => x.Consume(It.IsAny<Action<MockMessage>>()));
-
-            // Act
-            _messageBus.Subscribe<MockMessage>();
-
-            // Assert
-            _mockClient.Verify(x => x.Consume(It.IsAny<Action<MockMessage>>()), Times.Once);
-        }
 
         [Fact]
-        public async Task EventBus_Should_Consume_Message_Async()
+        public async Task EventBus_Should_Consume_Message()
         {
             // Arrange
             _mockClient.Setup(x => x.ConsumeAsync(It.IsAny<Action<MockMessage>>(), It.IsAny<CancellationToken>()));
