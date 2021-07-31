@@ -14,7 +14,6 @@ namespace Eiffel.Messaging.Tests
             _messageRouteRegistry = new MessageRouteRegistry();
         }
 
-
         [Fact]
         public void GetMessageRoute_Should_Throws_Exception_When_MessageRoute_Invalid()
         {

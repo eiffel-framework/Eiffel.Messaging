@@ -10,7 +10,5 @@ namespace Eiffel.Messaging.Kafka
         public ConsumerConfig ConsumerConfig { get; set; }
         
         public ProducerConfig ProducerConfig { get; set; }
-
-        public MessageSerializer MessageSerializer { get; set; }
     }
 }
