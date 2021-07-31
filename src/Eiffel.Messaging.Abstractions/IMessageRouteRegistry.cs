@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Eiffel.Messaging.Abstractions
 {
@@ -24,5 +25,7 @@ namespace Eiffel.Messaging.Abstractions
         /// Registers message(s) for route
         /// </summary>
         void Register(string route, Type[] types);
+
+        HashSet<Tuple<Type, string>> Routes { get; }
     }
 }

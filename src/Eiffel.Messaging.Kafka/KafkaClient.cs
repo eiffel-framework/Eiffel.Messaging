@@ -34,14 +34,12 @@ namespace Eiffel.Messaging.Kafka
             _config.Value.ConsumerConfig.ClientId = Dns.GetHostName();
         }
 
-        public virtual Task ConsumeAsync<TMessage>(Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
+        public virtual Task ConsumeAsync<TMessage>(string sourceTopic, Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
-            var messageRoute = GetMessageRoute<TMessage>();
-
             using(var consumer = new ConsumerBuilder<Null, byte[]>(_config.Value.ProducerConfig).Build())
             {
-                consumer.Subscribe(messageRoute);
+                consumer.Subscribe(sourceTopic);
 
                 var consumeTask = Task.Factory.StartNew(() =>
                 {
@@ -66,7 +64,7 @@ namespace Eiffel.Messaging.Kafka
                         }
                         catch (ConsumeException ex)
                         {
-                            _logger.LogError(ex, $"{_config.Value.Name} consume failed for {typeof(TMessage).Name} :: {messageRoute}");
+                            _logger.LogError(ex, $"{_config.Value.Name} consume failed for {typeof(TMessage).Name} :: {sourceTopic}");
                         }
                     }
 

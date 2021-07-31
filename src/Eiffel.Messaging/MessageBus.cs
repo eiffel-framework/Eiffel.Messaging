@@ -30,10 +30,10 @@ namespace Eiffel.Messaging
         /// Subscribe message
         /// </summary>
         /// <exception cref="OperationCanceledException" />
-        public Task SubscribeAsync<TMessage>(CancellationToken cancellationToken = default) 
+        public Task SubscribeAsync<TMessage>(string sourceTopic, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
-            return _client.ConsumeAsync<TMessage>(async (message) =>
+            return _client.ConsumeAsync<TMessage>(sourceTopic, async (message) =>
             {
                 await _mediator.DispatchAsync(message, cancellationToken);
             }, cancellationToken);

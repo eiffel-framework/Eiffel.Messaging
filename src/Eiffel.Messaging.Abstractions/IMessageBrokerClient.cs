@@ -13,7 +13,6 @@ namespace Eiffel.Messaging.Abstractions
         /// Sends message to message broker
         /// <seealso cref="IMessageRouteRegistry"/>
         /// </summary>
-        /// <typeparam name="TMessage">Message object</typeparam>
         /// <exception cref="OperationCanceledException" />
         Task ProduceAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
             where TMessage : class;
@@ -22,9 +21,8 @@ namespace Eiffel.Messaging.Abstractions
         /// Sends message to message broker
         /// <seealso cref="IMessageRouteRegistry"/>
         /// </summary>
-        /// <typeparam name="TMessage">Message object</typeparam>
         /// <exception cref="OperationCanceledException" />
-        Task ConsumeAsync<TMessage>(Action<TMessage> dispatcher, CancellationToken cancellationToken = default)
+        Task ConsumeAsync<TMessage>(string sourceTopic, Action<TMessage> dispatcher, CancellationToken cancellationToken = default)
             where TMessage : class;
 
         /// <summary>

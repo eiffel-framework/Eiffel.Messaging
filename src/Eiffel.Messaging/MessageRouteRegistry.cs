@@ -39,6 +39,13 @@ namespace Eiffel.Messaging
             }
         }
 
+        public virtual HashSet<Tuple<Type, string>> Routes
+        {
+            get {
+                return MessageRoutes.ToHashSet();
+            }
+        }
+
         private void Register(string route, Type messageType)
         {
             if (string.IsNullOrWhiteSpace(route))
