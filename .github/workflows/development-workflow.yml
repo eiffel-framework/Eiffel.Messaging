@@ -1,0 +1,26 @@
+name: Eiffel development workflow
+
+on: 
+  push:
+    branches: main
+  pull_request:
+    branches: main
+    
+jobs:
+  ci-pipline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build solution
+        run: dotnet build --no-restore
+      
+      - name: Run tests
+        run: dotnet test --no-build --no-restore --verbosity normal
