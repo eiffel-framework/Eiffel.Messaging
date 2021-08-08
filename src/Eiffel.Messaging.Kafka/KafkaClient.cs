@@ -34,6 +34,12 @@ namespace Eiffel.Messaging.Kafka
             _config.Value.ConsumerConfig.ClientId = Dns.GetHostName();
         }
 
+        /// <summary>
+        /// Consume message from message broker
+        /// <seealso cref="IMessageRouteRegistry"/>
+        /// </summary>
+        /// <exception cref="OperationCanceledException" />
+        /// <exception cref="ConsumeException" />
         public virtual Task ConsumeAsync<TMessage>(string sourceTopic, Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
@@ -74,6 +80,12 @@ namespace Eiffel.Messaging.Kafka
             }
         }
 
+        /// <summary>
+        /// Sends message to message broker
+        /// <seealso cref="IMessageRouteRegistry"/>
+        /// </summary>
+        /// <exception cref="OperationCanceledException" />
+        /// <exception cref="ProduceException{TKey, TValue}" />
         public virtual Task ProduceAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
@@ -91,6 +103,9 @@ namespace Eiffel.Messaging.Kafka
             }
         }
 
+        /// <summary>
+        /// Canacel all subscribtions
+        /// </summary>
         public virtual void Unsubscribe()
         {
             _cancellationTokenSource.Cancel();

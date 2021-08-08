@@ -18,7 +18,7 @@ namespace Eiffel.Messaging.Abstractions
             where TMessage : class;
 
         /// <summary>
-        /// Sends message to message broker
+        /// Consume message from message broker
         /// <seealso cref="IMessageRouteRegistry"/>
         /// </summary>
         /// <exception cref="OperationCanceledException" />
