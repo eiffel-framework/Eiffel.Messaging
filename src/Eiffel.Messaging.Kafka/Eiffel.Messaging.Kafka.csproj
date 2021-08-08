@@ -1,32 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<Authors>Eiffel Core Team</Authors>
-		<Company>Eiffel Framework</Company>
+		<Company>Eiffel Software Consultancy</Company>
 		<Product>Eiffel Messaging Kafka</Product>
 		<Description>Messaging Kafka Client</Description>
-		<Copyright>Eiffel Framework © 2021</Copyright>
+		<Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
 		<PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
 		<PackageIcon>logo.png</PackageIcon>
-		<Version>1.0.0</Version>
+		<Version>0.0.1</Version>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
 		<None Include="..\..\docs\logo.png" PackagePath="logo.png" Visible="False">
 			<Pack>True</Pack>
 		</None>
 	</ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="1.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
-  </ItemGroup>
-
+	
+	<ItemGroup>
+		<PackageReference Include="Confluent.Kafka" Version="1.7.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
+	</ItemGroup>
 </Project>
