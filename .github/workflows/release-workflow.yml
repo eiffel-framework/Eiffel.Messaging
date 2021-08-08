@@ -1,0 +1,46 @@
+name: Eiffel release workflow
+
+on: 
+  push:
+    branches: release
+  pull_request:
+    branches: release
+    
+jobs:
+  ci-pipline:
+    runs-on: windows-latest
+    if: contains(github.event.head_commit.message, 'Package version upgraded') == false
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
+          
+      - name: Get previous commit SHA
+        id: git
+        run: echo "::set-output name=prev_sha::$(git rev-parse HEAD~1)"
+
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+          
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+      
+      - name: Run tests
+        run: dotnet test --no-build --no-restore --verbosity normal --configuration Release
+        
+      - name: Version
+        run: .\scripts\version.ps1 -commitSHA ${{ github.sha }} -prevSHA ${{ steps.git.outputs.prev_sha }} -commitMsg '${{ github.event.head_commit.message }}'
+        shell: powershell
+      
+      - name: Pack
+        run: .\scripts\pack.ps1 -commitSHA ${{ github.sha }} -prevSHA ${{ steps.git.outputs.prev_sha }}
+        shell: powershell
+        
+      - name: Publish
+        run: .\scripts\publish.ps1 -source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' -apiKey ${{ secrets.GITHUB_TOKEN }} 
+        shell: powershell

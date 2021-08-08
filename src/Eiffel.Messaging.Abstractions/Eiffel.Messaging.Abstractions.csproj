@@ -3,14 +3,14 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<Authors>Eiffel Core Team</Authors>
-		<Company>Eiffel Framework</Company>
-		<Product>Eiffel Messaging</Product>
+		<Company>Eiffel Software Consultancy</Company>
+		<Product>Eiffel Messaging Kafka</Product>
 		<Description>Messaging abstractions</Description>
-		<Copyright>Eiffel Framework © 2021</Copyright>
+		<Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
 		<PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
 		<PackageIcon>logo.png</PackageIcon>
-		<Version>1.0.0</Version>
+		<Version>0.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
