@@ -34,7 +34,7 @@ jobs:
         run: dotnet test --no-build --no-restore --verbosity normal --configuration Release
         
       - name: Version
-        run: .\scripts\version.ps1 -commitSHA ${{ github.sha }} -prevSHA ${{ steps.git.outputs.prev_sha }} -commitMsg `${{ github.event.head_commit.message }}`
+        run: .\scripts\version.ps1 -commitSHA ${{ github.sha }} -prevSHA ${{ steps.git.outputs.prev_sha }} -commitMsg "${{ github.event.head_commit.message }}"
         shell: powershell
       
       - name: Pack

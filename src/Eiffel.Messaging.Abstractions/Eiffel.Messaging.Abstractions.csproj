@@ -10,7 +10,7 @@
 		<PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
 		<PackageIcon>logo.png</PackageIcon>
-		<Version>0.0.2</Version>
+		<Version>0.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
