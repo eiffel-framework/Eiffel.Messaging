@@ -4,7 +4,7 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<Authors>Eiffel Core Team</Authors>
 		<Company>Eiffel Software Consultancy</Company>
-		<Product>Eiffel Messaging Kafka</Product>
+		<Product>Eiffel Messaging Abstractions</Product>
 		<Description>Messaging abstractions</Description>
 		<Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
 		<PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
