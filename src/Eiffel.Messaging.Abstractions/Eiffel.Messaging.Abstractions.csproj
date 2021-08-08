@@ -1,22 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
-		<Authors>Eiffel Core Team</Authors>
-		<Company>Eiffel Software Consultancy</Company>
-		<Product>Eiffel Messaging Abstractions</Product>
-		<Description>Eiffel messaging abstractions</Description>
-		<Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
-		<PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
-		<PackageIcon>logo.png</PackageIcon>
-		<Version>0.0.1</Version>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\logo.png" PackagePath="logo.png" Visible="False">
-			<Pack>True</Pack>
-		</None>
-	</ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Authors>Eiffel Core Team</Authors>
+    <Company>Eiffel Software Consultancy</Company>
+    <Product>Eiffel Messaging Abstractions</Product>
+    <Description>Eiffel messaging abstractions</Description>
+    <Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
+    <PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
+    <PackageIcon>logo.png</PackageIcon>
+    <Version>0.0.2-alpha</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\docs\logo.png" PackagePath="logo.png" Visible="False">
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
 </Project>
