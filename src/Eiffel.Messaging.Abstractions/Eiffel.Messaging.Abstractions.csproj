@@ -5,7 +5,7 @@
 		<Authors>Eiffel Core Team</Authors>
 		<Company>Eiffel Software Consultancy</Company>
 		<Product>Eiffel Messaging Abstractions</Product>
-		<Description>Messaging abstractions</Description>
+		<Description>Eiffel messaging abstractions</Description>
 		<Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
 		<PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
