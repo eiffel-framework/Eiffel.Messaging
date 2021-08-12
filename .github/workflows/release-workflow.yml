@@ -32,10 +32,6 @@ jobs:
       
       - name: Run tests
         run: dotnet test --no-build --no-restore --verbosity normal --configuration Release
-        
-      - name: Version
-        run: .\scripts\version.ps1 -commitSHA ${{ github.sha }} -prevSHA ${{ steps.git.outputs.prev_sha }} -commitMsg "${{ github.event.head_commit.message }}"
-        shell: powershell
       
       - name: Pack
         run: .\scripts\pack.ps1 -commitSHA ${{ github.sha }} -prevSHA ${{ steps.git.outputs.prev_sha }}
@@ -43,4 +39,9 @@ jobs:
         
       - name: Publish
         run: .\scripts\publish.ps1 -source 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json' -apiKey ${{ secrets.GITHUB_TOKEN }} 
+        shell: powershell
+        
+      - name: Tag
+        if: contains(github.event.head_commit.message, '--tag') == true
+        run: .\scripts\tag.ps1 -commitMsg "${{ github.event.head_commit.message }}"
         shell: powershell
