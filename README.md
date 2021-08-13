@@ -1,5 +1,4 @@
 # Eiffel.Messaging
-Eiffel messaging library <br>
 
 ### Mediator
 
@@ -7,6 +6,6 @@ Eiffel messaging library <br>
 
 ### EventBus
 
-## Supported message brokers
+## Supported messaging platform
 
 ### Kafka
