@@ -1,5 +1,4 @@
 # Eiffel.Messaging
-Eiffel messaging library <br>
 
 ### Mediator
 
