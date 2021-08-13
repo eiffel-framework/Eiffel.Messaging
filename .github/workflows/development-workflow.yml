@@ -2,9 +2,9 @@ name: Eiffel development workflow
 
 on: 
   push:
-    branches: scripts
+    branches: main
   pull_request:
-    branches: scripts
+    branches: main
     
 jobs:
   ci-pipline:

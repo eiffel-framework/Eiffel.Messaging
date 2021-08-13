@@ -72,7 +72,7 @@ namespace Eiffel.Messaging.Tests
             // Arrange
             var tokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(1));
 
-            await Task.Delay(1);
+            await Task.Delay(5000);
 
             _containerBuilder.RegisterInstance(_mockCommandHandler.Object);
             _containerBuilder.RegisterInstance(_mockQueryHandler.Object);
