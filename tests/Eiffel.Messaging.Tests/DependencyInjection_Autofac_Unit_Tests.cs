@@ -1,5 +1,4 @@
-﻿
-using Autofac;
+﻿using Autofac;
 using Eiffel.Messaging.Abstractions;
 using Eiffel.Messaging.DependencyInjection.Autofac;
 using FluentAssertions;
@@ -19,15 +18,32 @@ namespace Eiffel.Messaging.Tests
             IConfiguration configuration = new ConfigurationBuilder().Build();
 
             _containerBuilder.RegisterInstance(configuration).As<IConfiguration>().SingleInstance();
+        }
 
-            _containerBuilder.RegisterType<MessageRouteRegistry>().As<IMessageRouteRegistry>().SingleInstance();
+        [Fact]
+        public void AddMessageRouteRegistry_Should_Register_MessageRouteRegistry_As_IMessageRouteRegistry()
+        {
+            // Act
+            _containerBuilder.AddMessageRouteRegistry();
 
-            _containerBuilder.RegisterType<DefaultMessageSerializer>().As<IMessageSerializer>();
+            // Assert
+            var container = _containerBuilder.Build();
 
-            _containerBuilder.Register(x =>
-            {
-                return new ServiceContainer(x.Resolve<ILifetimeScope>());
-            }).As<IServiceContainer>().SingleInstance();
+            container.IsRegistered<IMessageRouteRegistry>().Should().Be(true);
+            container.Resolve<IMessageRouteRegistry>();
+        }
+
+        [Fact]
+        public void AddMessageSerializer_Should_Register_MessageSerializer_As_IMessageSerializer()
+        {
+            // Act
+            _containerBuilder.AddMessageSerializer();
+
+            // Assert
+            var container = _containerBuilder.Build();
+
+            container.IsRegistered<IMessageSerializer>().Should().Be(true);
+            container.Resolve<IMessageSerializer>();
         }
 
         [Fact]
@@ -66,7 +82,6 @@ namespace Eiffel.Messaging.Tests
 
             container.IsRegistered<MockMessageHandler>().Should().Be(true);
             container.Resolve<MockMessageHandler>();
-
         }
 
         [Fact]
@@ -91,6 +106,11 @@ namespace Eiffel.Messaging.Tests
         [Fact]
         public void AddMessageBroker_Should_Register_MessageBroker_As_IMessageBrokerClient()
         {
+            // Arrange
+            _containerBuilder.RegisterType<MessageRouteRegistry>().As<IMessageRouteRegistry>().SingleInstance();
+
+            _containerBuilder.RegisterType<DefaultMessageSerializer>().As<IMessageSerializer>();
+
             // Act
             _containerBuilder.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
 
@@ -108,6 +128,10 @@ namespace Eiffel.Messaging.Tests
 
             _containerBuilder.AddMediator();
 
+            _containerBuilder.RegisterType<MessageRouteRegistry>().As<IMessageRouteRegistry>().SingleInstance();
+
+            _containerBuilder.RegisterType<DefaultMessageSerializer>().As<IMessageSerializer>();
+
             _containerBuilder.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
 
             // Act
@@ -124,8 +148,11 @@ namespace Eiffel.Messaging.Tests
         public void AddMessageBus_Should_Register_EventBus_As_IEventBus()
         {
             // Arrange
-
             _containerBuilder.AddMediator();
+
+            _containerBuilder.RegisterType<MessageRouteRegistry>().As<IMessageRouteRegistry>().SingleInstance();
+
+            _containerBuilder.RegisterType<DefaultMessageSerializer>().As<IMessageSerializer>();
 
             _containerBuilder.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
 

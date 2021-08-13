@@ -24,10 +24,30 @@ namespace Eiffel.Messaging.Tests
             IConfiguration configuration = new ConfigurationBuilder().Build();
 
             _services.AddSingleton(configuration);
+        }
 
-            _services.AddSingleton<IMessageRouteRegistry, MessageRouteRegistry>();
+        [Fact]
+        public void AddMessageRouteRegistry_Should_Register_MessageRouteRegistry_As_IMessageRouteRegistry()
+        {
+            // Act
+            _services.AddMessageRouteRegistry();
 
-            _services.AddSingleton<IMessageSerializer, DefaultMessageSerializer>();
+            // Assert
+            var serviceProvider = _services.BuildServiceProvider();
+
+            serviceProvider.GetService<IMessageRouteRegistry>().Should().NotBeNull();
+        }
+
+        [Fact]
+        public void AddMessageSerializer_Should_Register_MessageSerializer_As_IMessageSerializer()
+        {
+            // Act
+            _services.AddMessageSerializer();
+
+            // Assert
+            var serviceProvider = _services.BuildServiceProvider();
+
+            serviceProvider.GetService<IMessageSerializer>().Should().NotBeNull();
         }
 
         [Fact]
@@ -85,6 +105,10 @@ namespace Eiffel.Messaging.Tests
             // Act
             _services.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
 
+            _services.AddSingleton<IMessageRouteRegistry, MessageRouteRegistry>();
+
+            _services.AddSingleton<IMessageSerializer, DefaultMessageSerializer>();
+
             // Assert
             var serviceProvider = _services.BuildServiceProvider();
 
@@ -97,6 +121,10 @@ namespace Eiffel.Messaging.Tests
             // Arrange
 
             _services.AddMediator();
+
+            _services.AddSingleton<IMessageRouteRegistry, MessageRouteRegistry>();
+
+            _services.AddSingleton<IMessageSerializer, DefaultMessageSerializer>();
 
             _services.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
 
@@ -115,6 +143,10 @@ namespace Eiffel.Messaging.Tests
             // Arrange
 
             _services.AddMediator();
+
+            _services.AddSingleton<IMessageRouteRegistry, MessageRouteRegistry>();
+
+            _services.AddSingleton<IMessageSerializer, DefaultMessageSerializer>();
 
             _services.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
 

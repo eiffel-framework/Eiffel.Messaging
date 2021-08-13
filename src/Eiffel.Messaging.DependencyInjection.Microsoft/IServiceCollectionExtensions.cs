@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
@@ -23,9 +22,28 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
 
             services.AddSingleton<IMediator, Mediator>();
 
+            services.AddSingleton<IServiceContainer>(serviceProvider =>
+            {
+                return new ServiceContainer(serviceProvider);
+            });
+
             services.RegisterHandlers(assemblies);
 
             services.RegisterPipelines(assemblies);
+
+            return services;
+        }
+
+        public static IServiceCollection AddMessageRouteRegistry(this IServiceCollection services)
+        {
+            services.AddSingleton<IMessageRouteRegistry, MessageRouteRegistry>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddMessageSerializer(this IServiceCollection services)
+        {
+            services.AddSingleton<IMessageSerializer, DefaultMessageSerializer>();
 
             return services;
         }

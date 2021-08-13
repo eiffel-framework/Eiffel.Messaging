@@ -23,6 +23,11 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
                     .ToArray();
             }
 
+            builder.Register(context =>
+            {
+                return new ServiceContainer(context.Resolve<ILifetimeScope>());
+            }).As<IServiceContainer>().SingleInstance();
+
             builder.RegisterType<Mediator>().As<IMediator>().SingleInstance();
 
             builder.RegisterHandlers(assemblies);
@@ -68,6 +73,24 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
               .AssignableTo(typeof(IPipelinePostProcessor))
               .AsSelf()
               .SingleInstance();
+
+            return builder;
+        }
+
+        public static ContainerBuilder AddMessageRouteRegistry(this ContainerBuilder builder)
+        {
+            builder.RegisterType<MessageRouteRegistry>()
+                .As<IMessageRouteRegistry>()
+                .SingleInstance();
+
+            return builder;
+        }
+
+        public static ContainerBuilder AddMessageSerializer(this ContainerBuilder builder)
+        {
+            builder.RegisterType<DefaultMessageSerializer>()
+                .As<IMessageSerializer>()
+                .SingleInstance();
 
             return builder;
         }
