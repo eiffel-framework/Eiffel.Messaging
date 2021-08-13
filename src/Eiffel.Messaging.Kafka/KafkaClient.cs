@@ -110,12 +110,19 @@ namespace Eiffel.Messaging.Kafka
             _cancellationTokenSource.Cancel();
         }
 
+        /// <summary>
+        /// Dispose
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        ///  Dispose cancel all consumers
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             _cancellationTokenSource.Dispose();
