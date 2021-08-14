@@ -1,6 +1,8 @@
 ﻿using Eiffel.Messaging.Abstractions;
 using Eiffel.Messaging.InMemory;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +22,7 @@ namespace Eiffel.Messaging.Tests
         {
             _messageRouteRegistry = new MessageRouteRegistry();
 
-            _client = new InMemoryClient(new InMemoryClientConfig(), _messageRouteRegistry, new DefaultMessageSerializer());
+            _client = new InMemoryClient(new Mock<ILogger<InMemoryClient>>().Object, new InMemoryClientConfig(), _messageRouteRegistry, new DefaultMessageSerializer());
 
             _messageRouteRegistry.Register<MockEvent>("mock-event-route");
 
@@ -101,13 +103,13 @@ namespace Eiffel.Messaging.Tests
 
             _messageRouteRegistry.Register<MockMessage>("mock-meesage-route");
 
+            await _client.ProduceAsync(message);
+
             // Act 
             await _client.ConsumeAsync<MockMessage>((message) =>
             {
                 result = message;
             }, default);
-
-            await _client.ProduceAsync(message);
 
             // Assert
             result.Should().NotBeNull();

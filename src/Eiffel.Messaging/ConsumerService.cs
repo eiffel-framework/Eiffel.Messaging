@@ -1,4 +1,5 @@
-﻿using Eiffel.Messaging.Abstractions;
+﻿using Autofac;
+using Eiffel.Messaging.Abstractions;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Eiffel.Messaging
 {
-    public class ConsumerService : IHostedService
+    public class ConsumerService : BackgroundService
     {
         private readonly IMessageRouteRegistry _messageRouteRegistry;
         private readonly IMessageBus _messageBus;
@@ -18,26 +19,26 @@ namespace Eiffel.Messaging
             _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var tasks = CreateConsumerTasks(cancellationToken);
+            var tasks = CreateConsumerTasks(stoppingToken);
 
-            await Task.WhenAll(tasks);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _messageBus.Unsubscribe();
-
-            return Task.CompletedTask;
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await Task.WhenAll(tasks);
+            }
         }
 
         private IEnumerable<Task> CreateConsumerTasks(CancellationToken cancellationToken)
         {
-            foreach(var route in _messageRouteRegistry.Routes)
+            foreach (var route in _messageRouteRegistry.Routes)
             {
                 var method = _messageBus.GetType().GetMethod("SubscribeAsync").MakeGenericMethod(route.Item1);
-                yield return (Task)method.Invoke(_messageBus, new object[] { cancellationToken });
+
+                yield return Task.Run(async () =>
+                {
+                    await (Task)method.Invoke(_messageBus, new object[] { cancellationToken });
+                });
             }
         }
     }

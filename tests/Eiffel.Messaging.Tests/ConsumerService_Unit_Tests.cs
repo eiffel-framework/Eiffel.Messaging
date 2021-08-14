@@ -43,7 +43,7 @@ namespace Eiffel.Messaging.Tests
             await _consumerService.StartAsync(default);
 
             // Assert
-            _mockMessageBus.Verify(x => x.SubscribeAsync<dynamic>(It.IsAny<CancellationToken>()), Times.Exactly(3));
+            _mockMessageBus.Verify(x => x.SubscribeAsync<dynamic>(It.IsAny<CancellationToken>()), Times.AtLeast(3));
             _mockRegistry.VerifyGet(x => x.Routes, Times.Once);
         }
     }
