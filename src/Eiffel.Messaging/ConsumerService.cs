@@ -26,7 +26,7 @@ namespace Eiffel.Messaging
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.WhenAll(tasks);
+                await Task.WhenAny(tasks);
             }
         }
 

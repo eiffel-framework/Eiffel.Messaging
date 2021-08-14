@@ -40,6 +40,8 @@ namespace Eiffel.Messaging.Tests
             // Act
             await _consumerService.StartAsync(default);
 
+            await Task.Delay(3000);
+
             // Assert
             _mockMessageBus.Verify(x => x.SubscribeAsync<MockMessage>(It.IsAny<CancellationToken>()), Times.AtLeastOnce);
 
