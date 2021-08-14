@@ -23,5 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\Eiffel.Messaging\Eiffel.Messaging.csproj" />
   </ItemGroup>
 </Project>

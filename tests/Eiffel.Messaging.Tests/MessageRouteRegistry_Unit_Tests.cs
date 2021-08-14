@@ -50,7 +50,7 @@ namespace Eiffel.Messaging.Tests
             Action sut = () => _messageRouteRegistry.Register<MockCommand>(route);
 
             // Assert
-            Assert.Throws<MessageRouteNullOrWhiteSpaceException>(sut);
+            Assert.Throws<ArgumentNullException>(sut);
         }
 
         [Fact]

@@ -24,6 +24,7 @@
     <ProjectReference Include="..\..\src\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Eiffel.Messaging.DependencyInjection.Autofac\Eiffel.Messaging.DependencyInjection.Autofac.csproj" />
     <ProjectReference Include="..\..\src\Eiffel.Messaging.DependencyInjection.Microsoft\Eiffel.Messaging.DependencyInjection.Microsoft.csproj" />
+    <ProjectReference Include="..\..\src\Eiffel.Messaging.InMemory\Eiffel.Messaging.InMemory.csproj" />
     <ProjectReference Include="..\..\src\Eiffel.Messaging\Eiffel.Messaging.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,4 @@
-﻿using Autofac;
-using Eiffel.Messaging.Abstractions;
+﻿using Eiffel.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

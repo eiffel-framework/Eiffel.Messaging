@@ -11,9 +11,10 @@ namespace Eiffel.Messaging.Kafka
     public class KafkaClient : IMessageBrokerClient, IDisposable
     {
         private readonly ILogger<KafkaClient> _logger;
-        private readonly KafkaClientConfig _config;
         private readonly IMessageRouteRegistry _messageRouteRegistry;
         private readonly IMessageSerializer _messageSerializer;
+
+        private readonly KafkaClientConfig _config;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         public KafkaClient(ILogger<KafkaClient> logger, 
@@ -39,11 +40,13 @@ namespace Eiffel.Messaging.Kafka
         /// </summary>
         /// <exception cref="OperationCanceledException" />
         /// <exception cref="ConsumeException" />
-        public virtual Task ConsumeAsync<TMessage>(string sourceTopic, Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
+        public virtual Task ConsumeAsync<TMessage>(Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
             using(var consumer = new ConsumerBuilder<Null, byte[]>(_config.ProducerConfig).Build())
             {
+                var sourceTopic = _messageRouteRegistry.GetRoute<TMessage>();
+
                 consumer.Subscribe(sourceTopic);
 
                 var consumeTask = Task.Factory.StartNew(() =>

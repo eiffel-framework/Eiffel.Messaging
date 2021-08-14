@@ -43,13 +43,13 @@ namespace Eiffel.Messaging.Tests
         public async Task EventBus_Should_Consume_Message()
         {
             // Arrange
-            _mockClient.Setup(x => x.ConsumeAsync(It.IsAny<string>(), It.IsAny<Action<MockMessage>>(), It.IsAny<CancellationToken>()));
+            _mockClient.Setup(x => x.ConsumeAsync(It.IsAny<Action<MockMessage>>(), It.IsAny<CancellationToken>()));
 
             // Act
-            await _messageBus.SubscribeAsync<MockMessage>(It.IsAny<string>());
+            await _messageBus.SubscribeAsync<MockMessage>();
 
             // Assert
-            _mockClient.Verify(x => x.ConsumeAsync(It.IsAny<string>(), It.IsAny<Action<MockMessage>>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockClient.Verify(x => x.ConsumeAsync(It.IsAny<Action<MockMessage>>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

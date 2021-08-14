@@ -1,6 +1,5 @@
 ﻿using Eiffel.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +17,7 @@ namespace Eiffel.Messaging.Tests
         }
 
 
-        public Task ConsumeAsync<TMessage>(string sourceTopic, Action<TMessage> dispatcher, CancellationToken cancellationToken = default) where TMessage : class
+        public Task ConsumeAsync<TMessage>(Action<TMessage> dispatcher, CancellationToken cancellationToken = default) where TMessage : class
         {
             throw new NotImplementedException();
         }

@@ -35,10 +35,10 @@ namespace Eiffel.Messaging
         /// Subscribe event synchronically
         /// </summary>
         /// <exception cref="OperationCanceledException" />
-        public virtual Task SubscribeAsync<TEvent>(string sourceTopic, CancellationToken cancellationToken = default) 
+        public virtual Task SubscribeAsync<TEvent>(CancellationToken cancellationToken = default) 
             where TEvent : class
         {
-            return _client.ConsumeAsync(sourceTopic, async(TEvent @event) =>
+            return _client.ConsumeAsync(async(TEvent @event) =>
             {
                 await _mediator.PublishAsync(@event, cancellationToken);
             }, cancellationToken);

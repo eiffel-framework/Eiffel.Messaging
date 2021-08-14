@@ -37,13 +37,13 @@ namespace Eiffel.Messaging.Tests
         public async Task ConsumerService_Should_ConsumeMessages_When_Service_Started()
         {
             // Arrange
-            _mockMessageBus.Setup(x => x.SubscribeAsync<dynamic>(It.IsAny<string>(), It.IsAny<CancellationToken>()));
+            _mockMessageBus.Setup(x => x.SubscribeAsync<dynamic>(It.IsAny<CancellationToken>()));
 
             // Act
             await _consumerService.StartAsync(default);
 
             // Assert
-            _mockMessageBus.Verify(x => x.SubscribeAsync<dynamic>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+            _mockMessageBus.Verify(x => x.SubscribeAsync<dynamic>(It.IsAny<CancellationToken>()), Times.Exactly(3));
             _mockRegistry.VerifyGet(x => x.Routes, Times.Once);
         }
     }

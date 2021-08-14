@@ -6,5 +6,7 @@
     public interface IMessageBrokerClientConfig
     {
         public string Name { get; }
+
+        public void Validate();
     }
 }
