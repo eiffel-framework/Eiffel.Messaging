@@ -20,15 +20,6 @@ namespace Eiffel.Messaging.Tests
             _mockMessageBus = new Mock<IMessageBus>();
             _mockRegistry = new Mock<IMessageRouteRegistry>();
 
-            var messageRoutes = new HashSet<Tuple<Type, string>>()
-            {
-                new Tuple<Type, string>(typeof(MockMessage), "route1"),
-                new Tuple<Type, string>(typeof(MockEvent), "route2"),
-                new Tuple<Type, string>(typeof(MockCommand), "route3")
-            };
-
-            _mockRegistry.SetupGet(x => x.Routes).Returns(messageRoutes);
-
             _consumerService = new ConsumerService(_mockRegistry.Object, _mockMessageBus.Object);
 
         }
@@ -37,13 +28,21 @@ namespace Eiffel.Messaging.Tests
         public async Task ConsumerService_Should_ConsumeMessages_When_Service_Started()
         {
             // Arrange
-            _mockMessageBus.Setup(x => x.SubscribeAsync<dynamic>(It.IsAny<CancellationToken>()));
+            var messageRoutes = new HashSet<Tuple<Type, string>>()
+            {
+                new Tuple<Type, string>(typeof(MockMessage), "route1"),
+            };
+
+            _mockRegistry.SetupGet(x => x.Routes).Returns(messageRoutes);
+
+            _mockMessageBus.Setup(x => x.SubscribeAsync<MockMessage>(It.IsAny<CancellationToken>()));
 
             // Act
             await _consumerService.StartAsync(default);
 
             // Assert
-            _mockMessageBus.Verify(x => x.SubscribeAsync<dynamic>(It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+            _mockMessageBus.Verify(x => x.SubscribeAsync<MockMessage>(It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+
             _mockRegistry.VerifyGet(x => x.Routes, Times.AtLeastOnce);
         }
     }
