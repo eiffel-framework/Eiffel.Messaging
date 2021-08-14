@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Eiffel Core Team</Authors>
@@ -11,9 +12,11 @@
     <PackageIcon>logo.png</PackageIcon>
     <Version>0.1.0-alpha</Version>
   </PropertyGroup>
+	
   <ItemGroup>
     <None Include="..\..\docs\logo.png" PackagePath="logo.png" Visible="False">
       <Pack>True</Pack>
     </None>
   </ItemGroup>
+	
 </Project>
