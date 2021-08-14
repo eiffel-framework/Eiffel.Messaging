@@ -55,9 +55,14 @@ namespace Eiffel.Messaging.Tests
             _mockPostProcessor = new Mock<IPipelinePostProcessor>();
             _mockPostProcessor.Setup(x => x.ProcessAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()));
 
+            _containerBuilder.Register(context =>
+            {
+                return new ServiceContainer(context.Resolve<ILifetimeScope>());
+            }).As<IServiceContainer>().SingleInstance();
+
             _containerBuilder.Register<IMediator>(context =>
             {
-                return new Mediator(context.Resolve<ILifetimeScope>());
+                return new Mediator(context.Resolve<IServiceContainer>());
             }).SingleInstance();
         }
 

@@ -8,9 +8,12 @@ on:
     
 jobs:
   ci-pipline:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
       
       - uses: actions/setup-dotnet@v1
         with:
@@ -24,3 +27,13 @@ jobs:
       
       - name: Run tests
         run: dotnet test --no-build --no-restore --verbosity normal
+      
+      - name: Get previous commit SHA
+        if: contains(github.event.head_commit.message, '--') == true
+        id: git
+        run: echo "::set-output name=prev_sha::$(git rev-parse HEAD~1)"
+        
+      - name: Version
+        if: contains(github.event.head_commit.message, '--') == true
+        run: .\scripts\version.ps1 -commitSHA ${{ github.sha }} -prevSHA ${{ steps.git.outputs.prev_sha }} -commitMsg "${{ github.event.head_commit.message }}"
+        shell: powershell

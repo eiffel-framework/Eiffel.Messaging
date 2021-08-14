@@ -20,7 +20,7 @@ namespace Eiffel.Messaging.Abstractions
         /// Subscribe topic which message registered on IMessageRouteRegistry
         /// </summary>
         /// <exception cref="OperationCanceledException" />
-        Task SubscribeAsync<TMessage>(string sourceTopic, CancellationToken cancellationToken = default)
+        Task SubscribeAsync<TMessage>(CancellationToken cancellationToken = default)
             where TMessage : class;
 
         /// <summary>

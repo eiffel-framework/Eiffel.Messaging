@@ -50,7 +50,7 @@ namespace Eiffel.Messaging
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                throw new MessageRouteNullOrWhiteSpaceException();
+                throw new ArgumentNullException(nameof(route));
             }
 
             if (MessageRoutes.Any(x => x.Item1 == messageType))

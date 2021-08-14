@@ -22,7 +22,7 @@ namespace Eiffel.Messaging.Abstractions
         /// <seealso cref="IMessageRouteRegistry"/>
         /// </summary>
         /// <exception cref="OperationCanceledException" />
-        Task ConsumeAsync<TMessage>(string sourceTopic, Action<TMessage> dispatcher, CancellationToken cancellationToken = default)
+        Task ConsumeAsync<TMessage>(Action<TMessage> dispatcher, CancellationToken cancellationToken = default)
             where TMessage : class;
 
         /// <summary>

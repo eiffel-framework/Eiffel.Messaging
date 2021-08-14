@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 using Confluent.Kafka;
 using Eiffel.Messaging.Abstractions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Eiffel.Messaging.Kafka
 {
     public class KafkaClient : IMessageBrokerClient, IDisposable
     {
         private readonly ILogger<KafkaClient> _logger;
-        private readonly IOptions<KafkaClientConfig> _config;
         private readonly IMessageRouteRegistry _messageRouteRegistry;
         private readonly IMessageSerializer _messageSerializer;
+
+        private readonly KafkaClientConfig _config;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         public KafkaClient(ILogger<KafkaClient> logger, 
-            IOptions<KafkaClientConfig> config, 
+            KafkaClientConfig config, 
             IMessageRouteRegistry messageRouteRegistry,
             IMessageSerializer messageSerializer)
         {
@@ -30,8 +30,8 @@ namespace Eiffel.Messaging.Kafka
 
             _cancellationTokenSource = new CancellationTokenSource();
 
-            _config.Value.ProducerConfig.ClientId = Dns.GetHostName();
-            _config.Value.ConsumerConfig.ClientId = Dns.GetHostName();
+            _config.ProducerConfig.ClientId = Dns.GetHostName();
+            _config.ConsumerConfig.ClientId = Dns.GetHostName();
         }
 
         /// <summary>
@@ -40,11 +40,13 @@ namespace Eiffel.Messaging.Kafka
         /// </summary>
         /// <exception cref="OperationCanceledException" />
         /// <exception cref="ConsumeException" />
-        public virtual Task ConsumeAsync<TMessage>(string sourceTopic, Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
+        public virtual Task ConsumeAsync<TMessage>(Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
-            using(var consumer = new ConsumerBuilder<Null, byte[]>(_config.Value.ProducerConfig).Build())
+            using(var consumer = new ConsumerBuilder<Null, byte[]>(_config.ProducerConfig).Build())
             {
+                var sourceTopic = _messageRouteRegistry.GetRoute<TMessage>();
+
                 consumer.Subscribe(sourceTopic);
 
                 var consumeTask = Task.Factory.StartNew(() =>
@@ -70,7 +72,7 @@ namespace Eiffel.Messaging.Kafka
                         }
                         catch (ConsumeException ex)
                         {
-                            _logger.LogError(ex, $"{_config.Value.Name} consume failed for {typeof(TMessage).Name} :: {sourceTopic}");
+                            _logger.LogError(ex, $"{_config.Name} consume failed for {typeof(TMessage).Name} :: {sourceTopic}");
                         }
                     }
 
@@ -91,7 +93,7 @@ namespace Eiffel.Messaging.Kafka
         {
             var messageRoute = GetMessageRoute<TMessage>();
 
-            using (var producer = new ProducerBuilder<Null, byte[]>(_config.Value.ProducerConfig).Build())
+            using (var producer = new ProducerBuilder<Null, byte[]>(_config.ProducerConfig).Build())
             {
                 var payload = new Message<Null, byte[]>()
                 {
@@ -111,12 +113,19 @@ namespace Eiffel.Messaging.Kafka
             _cancellationTokenSource.Cancel();
         }
 
+        /// <summary>
+        /// Dispose
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        ///  Dispose cancel all consumers
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             _cancellationTokenSource.Dispose();

@@ -23,7 +23,7 @@ namespace Eiffel.Messaging.Abstractions
         /// Subscribe event synchronically
         /// </summary>
         /// <exception cref="OperationCanceledException" />
-        Task SubscribeAsync<TEvent>(string sourceTopic, CancellationToken cancellationToken = default)
+        Task SubscribeAsync<TEvent>(CancellationToken cancellationToken = default)
             where TEvent : class;
 
         /// <summary>

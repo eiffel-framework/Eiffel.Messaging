@@ -59,6 +59,10 @@ foreach($directory in Get-ChildItem -Directory -Path ./src)
             ElseIf($commitMsg.Contains("--beta")) {
                 $finalVersion = [string]$newVersion + '-beta'
             }
+            ElseIf($commitMsg.Contains("--preview")) {
+                $finalVersion = [string]$newVersion + '-preview'
+            }
+
             Else {
                 $finalVersion = [string]$newVersion
             }
@@ -67,23 +71,11 @@ foreach($directory in Get-ChildItem -Directory -Path ./src)
 			
 			$csprojXml.Save($csprojFile)
 			
-			try 
-			{	
-        
-				$tagName = "v$($finalVersion)";
+            & git add .
 			
-				& git add .
-			
-				& git commit -m "Package version upgraded"
-			
-				& git tag -a $tagName -m "Version v$($finalVersion)"
-	
-				& git push origin --follow-tags
-			}
-			catch 
-			{
-				throw $_
-			}
+			& git commit -m "Package version upgraded to $($finalVersion)"
+
+            & git push origin
         }
     }
 }

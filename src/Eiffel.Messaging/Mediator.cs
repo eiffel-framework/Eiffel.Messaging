@@ -1,5 +1,4 @@
-﻿using Autofac;
-using Eiffel.Messaging.Abstractions;
+﻿using Eiffel.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +9,11 @@ namespace Eiffel.Messaging
 {
     public class Mediator : IMediator
     {
-        private readonly ILifetimeScope _lifetimeScope;
+        private readonly IServiceContainer _serviceContainer;
 
-        public Mediator(ILifetimeScope lifetimeScope)
+        public Mediator(IServiceContainer serviceContainer)
         {
-            _lifetimeScope = lifetimeScope ?? throw new ArgumentNullException(nameof(lifetimeScope));
+            _serviceContainer = serviceContainer ?? throw new ArgumentNullException(nameof(serviceContainer));
         }
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace Eiffel.Messaging
 
             var handlerType = typeof(IEnumerable<>).MakeGenericType(typeof(IEventHandler<>).MakeGenericType(payload.GetType()));
 
-            var handlers = _lifetimeScope.Resolve(handlerType) as dynamic;
+            var handlers = _serviceContainer.Resolve(handlerType) as dynamic;
 
             if (handlers == null || handlers?.Length == 0)
             {
@@ -115,7 +114,7 @@ namespace Eiffel.Messaging
                 throw new OperationCanceledException();
             }
 
-            if (!_lifetimeScope.IsRegistered(handlerType))
+            if (!_serviceContainer.IsRegistered(handlerType))
             {
                 throw new HandlerNotFoundException(handlerType.Name);
             }
@@ -127,14 +126,14 @@ namespace Eiffel.Messaging
                 throw new MissingMethodException("Handler method is missing");
             }
 
-            var handler = _lifetimeScope.Resolve(handlerType);
+            var handler = _serviceContainer.Resolve(handlerType);
 
-            _lifetimeScope.Resolve<IEnumerable<IPipelinePreProcessor>>()?.ToList()?
+            _serviceContainer.Resolve<IEnumerable<IPipelinePreProcessor>>()?.ToList()?
                 .ForEach(async pre => await pre.ProcessAsync(payload).ConfigureAwait(false));
 
             var result = (TResult)targetMethod.Invoke(handler, new object[] { payload, cancellationToken });
 
-            _lifetimeScope.Resolve<IEnumerable<IPipelinePostProcessor>>()?.ToList()?
+            _serviceContainer.Resolve<IEnumerable<IPipelinePostProcessor>>()?.ToList()?
                 .ForEach(async post => await post.ProcessAsync(payload, cancellationToken).ConfigureAwait(false));
 
             return result;
