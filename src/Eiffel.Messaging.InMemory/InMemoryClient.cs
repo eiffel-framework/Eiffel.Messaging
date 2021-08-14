@@ -1,23 +1,35 @@
-﻿using Eiffel.Messaging.Abstractions;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Logging;
+
+using Eiffel.Messaging.Abstractions;
 
 namespace Eiffel.Messaging.InMemory
 {
     public class InMemoryClient : IMessageBrokerClient, IDisposable
     {
-        private readonly ConcurrentDictionary<string, BehaviorSubject<byte[]>> _subscriptions;
+        private readonly ConcurrentDictionary<string, BlockingCollection<byte[]>> _messageQueue;
+
+        private readonly ILogger<InMemoryClient> _logger;
         private readonly InMemoryClientConfig _config;
+
         private readonly IMessageRouteRegistry _messageRouteRegistry;
         private readonly IMessageSerializer _messageSerializer;
 
-        public InMemoryClient(InMemoryClientConfig config, IMessageRouteRegistry messageRouteRegistry, IMessageSerializer messageSerializer)
+        public InMemoryClient(
+            ILogger<InMemoryClient> logger, 
+            InMemoryClientConfig config, 
+            IMessageRouteRegistry messageRouteRegistry, 
+            IMessageSerializer messageSerializer)
         {
-            _subscriptions = new ConcurrentDictionary<string, BehaviorSubject<byte[]>>();
+            _messageQueue = new ConcurrentDictionary<string, BlockingCollection<byte[]>>();
+
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _config = config ?? throw new ArgumentNullException(nameof(config));
+
             _messageRouteRegistry = messageRouteRegistry ?? throw new ArgumentNullException(nameof(messageRouteRegistry));
             _messageSerializer = messageSerializer ?? throw new ArgumentNullException(nameof(messageSerializer));
         }
@@ -35,18 +47,23 @@ namespace Eiffel.Messaging.InMemory
                 throw new OperationCanceledException();
             }
 
-            var topicName = _messageRouteRegistry.GetRoute<TMessage>();
+            var targetTopic = _messageRouteRegistry.GetRoute<TMessage>();
 
-            CreateSubscription(topicName);
-
-            _subscriptions[topicName].Subscribe((bytes) =>
+            if (!_messageQueue.ContainsKey(targetTopic))
             {
-                if (bytes == null) return;
+                return Task.CompletedTask;
+            }
 
-                var message = _messageSerializer.Deserialize<TMessage>(bytes);
+            _messageQueue[targetTopic].TryTake(out byte[] bytes, 0, cancellationToken);
 
-                dispatcher.Invoke(message);
-            });
+            if (bytes == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            var message = _messageSerializer.Deserialize<TMessage>(bytes);
+
+            dispatcher.Invoke(message);
 
             return Task.CompletedTask;
         }
@@ -64,25 +81,27 @@ namespace Eiffel.Messaging.InMemory
                 throw new OperationCanceledException();
             }
 
+            var targetTopic = _messageRouteRegistry.GetRoute<TMessage>();
 
-            var topicName = _messageRouteRegistry.GetRoute<TMessage>(); 
+            if (!_messageQueue.ContainsKey(targetTopic))
+            {
+                _messageQueue.TryAdd(targetTopic, new BlockingCollection<byte[]>(_config.Capacity));
+            }
 
             var bytes = _messageSerializer.Serialize(message);
 
-            CreateSubscription(topicName);
+            _messageQueue[targetTopic].TryAdd(bytes, 0, cancellationToken);
 
-            _subscriptions[topicName].OnNext(bytes);
-            
             return Task.CompletedTask;
         }
 
         public virtual void Unsubscribe()
         {
-            foreach (var subscription in _subscriptions)
+            foreach(var topic in _messageQueue.Keys)
             {
-                subscription.Value.Dispose();
+                _messageQueue[topic].CompleteAdding();
+                _messageQueue[topic].Dispose();
             }
-            _subscriptions.Clear();
         }
 
         /// <summary>
@@ -101,16 +120,6 @@ namespace Eiffel.Messaging.InMemory
         protected virtual void Dispose(bool disposing)
         {
             Unsubscribe();
-        }
-
-        private void CreateSubscription(string topicName)
-        {
-            if (!_subscriptions.ContainsKey(topicName))
-            {
-                var result = _subscriptions.TryAdd(topicName, new BehaviorSubject<byte[]>(null));
-                if (!result)
-                    throw new AccessViolationException();
-            }
         }
     }
 }
