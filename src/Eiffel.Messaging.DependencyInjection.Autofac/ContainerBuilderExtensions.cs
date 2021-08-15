@@ -108,6 +108,8 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
 
                 configuration.Bind($"Eiffel:Messaging:{config.Name}", config);
 
+                config.Validate();
+
                 var logger = new LoggerFactory().CreateLogger<TClient>();
 
                 var registry = context.Resolve<IMessageRouteRegistry>();
