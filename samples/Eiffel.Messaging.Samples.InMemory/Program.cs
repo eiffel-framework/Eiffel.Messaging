@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Configuration;
@@ -33,7 +32,7 @@ namespace Eiffel.Messaging.Samples.InMemory
 
             var registry = serviceHost.Services.GetAutofacRoot().Resolve<IMessageRouteRegistry>();
 
-            registry.Register<InMemoryMessage>("sample-route");
+            registry.Register<Notification>("sample-route");
 
             await serviceHost.RunAsync();
         }
@@ -72,22 +71,5 @@ namespace Eiffel.Messaging.Samples.InMemory
                 .As<IHostedService>()
                 .InstancePerDependency();
         }
-    }
-
-    public class MessageHandler : IMessageHandler<InMemoryMessage>
-    {
-        public async Task HandleAsync(InMemoryMessage payload, CancellationToken cancellationToken = default)
-        {
-            await Console.Out.WriteLineAsync(payload.Message);
-        }
-    }
-
-    public class InMemoryMessage : IMessage
-    {
-        public InMemoryMessage(string message)
-        {
-            Message = message;
-        }
-        public string Message { get; }
     }
 }

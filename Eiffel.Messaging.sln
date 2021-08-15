@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eiffel.Messaging.Dependency
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eiffel.Messaging.InMemory", "src\Eiffel.Messaging.InMemory\Eiffel.Messaging.InMemory.csproj", "{B355FA51-C74B-4B3C-8030-724D869A121B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eiffel.Messaging.Samples.InMemory", "samples\Eiffel.Messaging.Samples.InMemory\Eiffel.Messaging.Samples.InMemory.csproj", "{C7376B79-D1C0-4F4E-8A49-A2EC388E16B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Eiffel.Messaging.Samples.InMemory", "samples\Eiffel.Messaging.Samples.InMemory\Eiffel.Messaging.Samples.InMemory.csproj", "{C7376B79-D1C0-4F4E-8A49-A2EC388E16B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eiffel.Messaging.Samples.Kafka", "samples\Eiffel.Messaging.Samples.Kafka\Eiffel.Messaging.Samples.Kafka.csproj", "{515F2CF2-18DF-4399-957E-AAAEEEDE43D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{C7376B79-D1C0-4F4E-8A49-A2EC388E16B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7376B79-D1C0-4F4E-8A49-A2EC388E16B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7376B79-D1C0-4F4E-8A49-A2EC388E16B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{515F2CF2-18DF-4399-957E-AAAEEEDE43D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{515F2CF2-18DF-4399-957E-AAAEEEDE43D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{515F2CF2-18DF-4399-957E-AAAEEEDE43D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{515F2CF2-18DF-4399-957E-AAAEEEDE43D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{0A237202-7D20-403D-8A40-A59C3FD96C64} = {E61BB965-09EE-4D03-B734-D65C02AB7AC7}
 		{B355FA51-C74B-4B3C-8030-724D869A121B} = {E61BB965-09EE-4D03-B734-D65C02AB7AC7}
 		{C7376B79-D1C0-4F4E-8A49-A2EC388E16B1} = {608AEB0E-3BA1-4A3C-BC7D-E93F9A091641}
+		{515F2CF2-18DF-4399-957E-AAAEEEDE43D6} = {608AEB0E-3BA1-4A3C-BC7D-E93F9A091641}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {298F5AE4-E289-489E-85DC-68CD8B17EB92}
