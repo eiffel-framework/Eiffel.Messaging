@@ -1,32 +1,27 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
-		<Authors>Eiffel Core Team</Authors>
-		<Company>Eiffel Software Consultancy</Company>
-		<Product>Eiffel Messaging Dependency Injection Autofac</Product>
-		<Description>Eiffel dependency injection Autofac</Description>
-		<Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
-		<PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
-		<PackageIcon>logo.png</PackageIcon>
-		<Version>0.0.1</Version>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\docs\logo.png" PackagePath="logo.png" Visible="False">
-			<Pack>True</Pack>
-		</None>
-	</ItemGroup>
-	
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
-		<ProjectReference Include="..\Eiffel.Messaging\Eiffel.Messaging.csproj" />
-	</ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Authors>Eiffel Core Team</Authors>
+    <Company>Eiffel Software Consultancy</Company>
+    <Product>Eiffel Messaging Dependency Injection Autofac</Product>
+    <Description>Eiffel dependency injection Autofac</Description>
+    <Copyright>2020 - 2021 Eiffel Software Consultancy, Efe OZYER</Copyright>
+    <PackageProjectUrl>https://eiffel-framework.com/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/eiffel-framework/Eiffel.Messaging</RepositoryUrl>
+    <PackageIcon>logo.png</PackageIcon>
+    <Version>0.1.0-alpha</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\docs\logo.png" PackagePath="logo.png" Visible="False">
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\Eiffel.Messaging\Eiffel.Messaging.csproj" />
+  </ItemGroup>
 </Project>
