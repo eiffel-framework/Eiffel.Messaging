@@ -66,10 +66,7 @@ namespace Eiffel.Messaging.Samples.InMemory
             builder.AddMessageSerializer();
             builder.AddMessageBroker<InMemoryClient, InMemoryClientConfig>();
             builder.AddMessageBus();
-
-            builder.RegisterType<ConsumerService>()
-                .As<IHostedService>()
-                .InstancePerDependency();
+            builder.AddConsumerServices();
 
             builder.RegisterType<Worker>()
                 .As<IHostedService>()

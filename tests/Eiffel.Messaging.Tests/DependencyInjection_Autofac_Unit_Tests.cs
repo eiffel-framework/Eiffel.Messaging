@@ -3,6 +3,10 @@ using Eiffel.Messaging.Abstractions;
 using Eiffel.Messaging.DependencyInjection.Autofac;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Moq;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Eiffel.Messaging.Tests
@@ -164,6 +168,42 @@ namespace Eiffel.Messaging.Tests
 
             container.IsRegistered<IEventBus>().Should().Be(true);
             container.Resolve<IEventBus>();
+        }
+
+        [Fact]
+        public void AddConsumerService_Should_Register_Service()
+        {
+            // Arrange
+            _containerBuilder.RegisterInstance(new Mock<IMessageBus>().Object);
+
+            // Act
+            _containerBuilder.AddConsumerService<MockMessage>();
+
+            // Assert
+            var contaier = _containerBuilder.Build();
+
+            contaier.IsRegistered<IHostedService>().Should().Be(true);
+
+            contaier.Resolve<IHostedService>().Should().NotBeNull();
+        }
+
+        [Fact]
+        public void AddConsumerServices_Should_Register_Service_ForEach_Message()
+        {
+            // Arrange
+            _containerBuilder.RegisterInstance(new Mock<IMessageBus>().Object);
+
+            // Act
+            _containerBuilder.AddConsumerServices();
+
+            // Assert
+            var contaier = _containerBuilder.Build();
+
+            var services = contaier.Resolve<IEnumerable<IHostedService>>();
+
+            services.Should().NotBeNullOrEmpty();
+
+            services.Count().Should().BeGreaterOrEqualTo(3);
         }
     }
 }

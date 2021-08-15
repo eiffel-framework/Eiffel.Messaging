@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,38 +8,28 @@ using Eiffel.Messaging.Abstractions;
 
 namespace Eiffel.Messaging
 {
-    public class ConsumerService : BackgroundService
+    public class ConsumerService<TMessage> : BackgroundService
+        where TMessage : class
     {
-        private readonly IMessageRouteRegistry _messageRouteRegistry;
         private readonly IMessageBus _messageBus;
 
-        public ConsumerService(IMessageRouteRegistry messageRouteRegistry, IMessageBus messageBus)
+        public ConsumerService(IMessageBus messageBus)
         {
-            _messageRouteRegistry = messageRouteRegistry ?? throw new ArgumentNullException(nameof(messageRouteRegistry));
             _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var tasks = CreateConsumerTasks(stoppingToken);
-
-            while (!stoppingToken.IsCancellationRequested)
+            await Task.Run(async () =>
             {
-                await Task.WhenAny(tasks);
-            }
-        }
-
-        private IEnumerable<Task> CreateConsumerTasks(CancellationToken cancellationToken)
-        {
-            foreach (var route in _messageRouteRegistry.Routes)
-            {
-                var method = _messageBus.GetType().GetMethod("SubscribeAsync").MakeGenericMethod(route.Item1);
-
-                yield return Task.Run(async () =>
+                while (true)
                 {
-                    await (Task)method.Invoke(_messageBus, new object[] { cancellationToken });
-                });
-            }
+                    if (stoppingToken.IsCancellationRequested)
+                        break;
+
+                    await _messageBus.SubscribeAsync<TMessage>(stoppingToken);
+                }
+            }).ConfigureAwait(false);
         }
     }
 }

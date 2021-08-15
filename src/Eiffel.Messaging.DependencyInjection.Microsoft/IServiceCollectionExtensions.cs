@@ -1,6 +1,7 @@
 ﻿using Eiffel.Messaging.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -141,6 +142,38 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
 
                 return new EventBus(mediator, client);
             });
+
+            return services;
+        }
+
+        public static IServiceCollection AddConsumerService<TMessage>(this IServiceCollection services)
+            where TMessage : class
+        {
+            services.AddHostedService<ConsumerService<TMessage>>();
+            return services;
+        }
+
+        public static IServiceCollection AddConsumerServices(this IServiceCollection services, Assembly[] assemblies = null)
+        {
+            if (assemblies == null)
+            {
+                assemblies = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.TopDirectoryOnly)
+                    .Select(Assembly.LoadFrom)
+                    .ToArray();
+            }
+
+            var messageTypes = assemblies.SelectMany(x => x.GetTypes().Where(x =>
+                            (x.IsAssignableTo(typeof(IMessage)) ||
+                             x.IsAssignableTo(typeof(ICommand)) ||
+                             x.IsAssignableTo(typeof(IEvent)) ||
+                             x.IsAssignableTo(typeof(IQuery<>))) && x.IsClass));
+
+            foreach (var messageType in messageTypes)
+            {
+                var serviceType = typeof(ConsumerService<>).MakeGenericType(messageType);
+
+                services.AddTransient(typeof(IHostedService), serviceType);
+            }
 
             return services;
         }
