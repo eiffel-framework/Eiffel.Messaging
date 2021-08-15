@@ -23,7 +23,7 @@ foreach($directory in Get-ChildItem -Directory -Path ./src)
 
         $csprojXml = [Xml] (Get-Content $csprojFile)
 
-        $currentVersion = [version] $csprojXml.Project.PropertyGroup.Version
+        $currentVersion = [version] $csprojXml.Project.PropertyGroup.Version.Replace("-alpha", "").Replace("-beta", "")
 
         if ([string]::IsNullOrWhiteSpace($csprojXml.Project.PropertyGroup.Version)) 
         {

@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Eiffel.Messaging.Abstractions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -143,6 +144,39 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
 
                 return new EventBus(mediator, client);
             }).As<IEventBus>().SingleInstance();
+
+            return builder;
+        }
+
+        public static ContainerBuilder AddConsumerService<TMessage>(this ContainerBuilder builder)
+            where TMessage : class
+        {
+            builder.RegisterType<ConsumerService<TMessage>>()
+                .InstancePerDependency()
+                .As<IHostedService>();
+
+            return builder;
+        }
+
+        public static ContainerBuilder AddConsumerServices(this ContainerBuilder builder, Assembly[] assemblies = null)
+        {
+            if (assemblies == null)
+            {
+                assemblies = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.TopDirectoryOnly)
+                    .Select(Assembly.LoadFrom)
+                    .ToArray();
+            }
+
+            var messageTypes = assemblies.SelectMany(x => x.GetTypes().Where(x =>
+                            (x.IsAssignableTo(typeof(IMessage)) ||
+                             x.IsAssignableTo(typeof(ICommand)) ||
+                             x.IsAssignableTo(typeof(IEvent))) && x.IsClass)) ?? Enumerable.Empty<Type>();
+
+            foreach(var messageType in messageTypes)
+            {
+                var consumerService = typeof(ConsumerService<>).MakeGenericType(messageType);
+                builder.RegisterType(consumerService).InstancePerDependency().As<IHostedService>();
+            }
 
             return builder;
         }

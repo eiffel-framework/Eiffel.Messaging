@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>dotnet-Eiffel.Messaging.Samples.InMemory-AB30015B-D50B-49A2-83EB-4C8012ACB057</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+	  <PackageReference Include="Autofac" Version="6.2.0" />
+	  <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+	  <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Eiffel.Messaging.DependencyInjection.Autofac\Eiffel.Messaging.DependencyInjection.Autofac.csproj" />
+    <ProjectReference Include="..\..\src\Eiffel.Messaging.InMemory\Eiffel.Messaging.InMemory.csproj" />
+  </ItemGroup>
+</Project>
