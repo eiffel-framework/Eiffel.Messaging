@@ -2,9 +2,13 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Confluent.Kafka;
-using Eiffel.Messaging.Abstractions;
+
 using Microsoft.Extensions.Logging;
+
+using Confluent.Kafka;
+
+using Eiffel.Messaging.Abstractions;
+
 
 namespace Eiffel.Messaging.Kafka
 {
