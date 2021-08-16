@@ -44,23 +44,23 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
         public static ContainerBuilder RegisterHandlers(this ContainerBuilder builder, Assembly[] assemblies = null)
         {
             builder.RegisterAssemblyTypes(assemblies)
-                .AsClosedTypesOf(typeof(ICommandHandler<>))
-                .AsSelf()
-                .InstancePerLifetimeScope();
+               .AsClosedTypesOf(typeof(ICommandHandler<>))
+               .AsImplementedInterfaces()
+               .InstancePerLifetimeScope();
 
             builder.RegisterAssemblyTypes(assemblies)
                .AsClosedTypesOf(typeof(IQueryHandler<,>))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .InstancePerLifetimeScope();
 
             builder.RegisterAssemblyTypes(assemblies)
                .AsClosedTypesOf(typeof(IEventHandler<>))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .InstancePerLifetimeScope();
 
             builder.RegisterAssemblyTypes(assemblies)
                .AsClosedTypesOf(typeof(IMessageHandler<>))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .InstancePerLifetimeScope();
 
             return builder;
@@ -70,13 +70,13 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
         {
             builder.RegisterAssemblyTypes(assemblies)
                .AssignableTo(typeof(IPipelinePreProcessor))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .SingleInstance();
 
             builder.RegisterAssemblyTypes(assemblies)
-              .AssignableTo(typeof(IPipelinePostProcessor))
-              .AsSelf()
-              .SingleInstance();
+               .AssignableTo(typeof(IPipelinePostProcessor))
+               .AsImplementedInterfaces()
+               .SingleInstance();
 
             return builder;
         }

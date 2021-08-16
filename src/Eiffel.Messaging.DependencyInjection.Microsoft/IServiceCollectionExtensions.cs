@@ -55,28 +55,28 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
         {
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(ICommandHandler<>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(ICommandHandler<,>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(IQueryHandler<,>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(IEventHandler<>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
-               .AddClasses(x => x.AssignableTo(typeof(IMessageHandler<>)))
-               .AsSelf()
-               .WithSingletonLifetime());
+                .AddClasses(x => x.AssignableTo(typeof(IMessageHandler<>)))
+                .AsImplementedInterfaces()
+                .WithSingletonLifetime());
 
             return services;
         }
@@ -85,12 +85,12 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
         {
             services.Scan(x => x.FromAssemblies(assemblies)
                .AddClasses(x => x.AssignableTo(typeof(IPipelinePreProcessor)))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                .AddClasses(x => x.AssignableTo(typeof(IPipelinePostProcessor)))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .WithSingletonLifetime());
 
             return services;
