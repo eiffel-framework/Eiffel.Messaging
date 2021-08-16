@@ -35,7 +35,12 @@ namespace Eiffel.Messaging
         {
             return _client.ConsumeAsync<TMessage>(async (message) =>
             {
-                await _mediator.DispatchAsync(message, cancellationToken);
+                if (message is ICommand cmd)
+                    await _mediator.SendAsync(cmd, cancellationToken);
+                else if (message is IMessage msg)
+                    await _mediator.DispatchAsync(msg, cancellationToken);
+                else
+                    throw new ArgumentException($"{ nameof(TMessage) } must be implemented from ICommand or IMessage");
             }, cancellationToken);
         }
 

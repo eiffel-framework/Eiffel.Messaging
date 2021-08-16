@@ -9,7 +9,7 @@ namespace Eiffel.Messaging.Tests
     public class MockBrokerClient : IMessageBrokerClient
     {
         public MockBrokerClient(
-            Logger<MockBrokerClient> logger, 
+            Logger<MockBrokerClient> logger,
             MockBrokerClientConfig config,
             IMessageRouteRegistry messageRouteRegistry,
             IMessageSerializer messageSerializer)

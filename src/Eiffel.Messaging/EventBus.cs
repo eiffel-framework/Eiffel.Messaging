@@ -40,7 +40,10 @@ namespace Eiffel.Messaging
         {
             return _client.ConsumeAsync(async(TEvent @event) =>
             {
-                await _mediator.PublishAsync(@event, cancellationToken);
+                if (@event is IEvent evt)
+                    await _mediator.PublishAsync(@evt, cancellationToken);
+                else
+                    throw new ArgumentException($"{nameof(TEvent)} must be implemented from IEvent");
             }, cancellationToken);
         }
 

@@ -1,12 +1,14 @@
-﻿using Eiffel.Messaging.Abstractions;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+
+using Eiffel.Messaging.Abstractions;
 
 namespace Eiffel.Messaging.DependencyInjection.Microsoft
 {
@@ -53,28 +55,28 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
         {
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(ICommandHandler<>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(ICommandHandler<,>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(IQueryHandler<,>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                 .AddClasses(x => x.AssignableTo(typeof(IEventHandler<>)))
-                .AsSelf()
+                .AsImplementedInterfaces()
                 .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
-               .AddClasses(x => x.AssignableTo(typeof(IMessageHandler<>)))
-               .AsSelf()
-               .WithSingletonLifetime());
+                .AddClasses(x => x.AssignableTo(typeof(IMessageHandler<>)))
+                .AsImplementedInterfaces()
+                .WithSingletonLifetime());
 
             return services;
         }
@@ -83,12 +85,12 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
         {
             services.Scan(x => x.FromAssemblies(assemblies)
                .AddClasses(x => x.AssignableTo(typeof(IPipelinePreProcessor)))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .WithSingletonLifetime());
 
             services.Scan(x => x.FromAssemblies(assemblies)
                .AddClasses(x => x.AssignableTo(typeof(IPipelinePostProcessor)))
-               .AsSelf()
+               .AsImplementedInterfaces()
                .WithSingletonLifetime());
 
             return services;
@@ -104,7 +106,9 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
-                configuration.Bind($"Eiffel:Messaging:{config.Name}", config);
+                configuration.Bind($"Messaging:{config.Name}", config);
+
+                config?.Validate();
 
                 var logger = new LoggerFactory().CreateLogger<TClient>();
 

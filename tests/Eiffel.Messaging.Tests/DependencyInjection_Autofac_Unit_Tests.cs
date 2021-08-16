@@ -1,13 +1,19 @@
-﻿using Autofac;
-using Eiffel.Messaging.Abstractions;
-using Eiffel.Messaging.DependencyInjection.Autofac;
-using FluentAssertions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Moq;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+
+using Moq;
 using Xunit;
+using Autofac;
+using FluentAssertions;
+
+using Eiffel.Messaging.Abstractions;
+using Eiffel.Messaging.DependencyInjection.Autofac;
+using Eiffel.Messaging.Exceptions;
 
 namespace Eiffel.Messaging.Tests
 {
@@ -15,13 +21,36 @@ namespace Eiffel.Messaging.Tests
     {
         private readonly ContainerBuilder _containerBuilder;
 
+        private readonly Mock<IMessageBrokerClient> _mockMessageBrokerClient;
+        private readonly Mock<IMessageRouteRegistry> _mockMessageRouteRegistry;
+        private readonly Mock<IMessageSerializer> _mockMessageSerializer;
+        private readonly Mock<IMediator> _mockMediator;
+        private readonly Mock<IMessageBus> _mockMessageBus;
+        private readonly IConfiguration _mockValidConfiguration;
+        private readonly IConfiguration _mockInvalidConfiguraton;
+
         public DependencyInjection_Autofac_Unit_Tests()
         {
             _containerBuilder = new ContainerBuilder();
 
-            IConfiguration configuration = new ConfigurationBuilder().Build();
+            _mockMessageRouteRegistry = new Mock<IMessageRouteRegistry>();
 
-            _containerBuilder.RegisterInstance(configuration).As<IConfiguration>().SingleInstance();
+            _mockMessageSerializer = new Mock<IMessageSerializer>();
+
+            _mockMessageBrokerClient = new Mock<IMessageBrokerClient>();
+
+            _mockMediator = new Mock<IMediator>();
+
+            _mockMessageBus = new Mock<IMessageBus>();
+
+            var config = new Dictionary<string, string>
+            {
+                {"Messaging:Mock:Count", "1"},
+            };
+
+            _mockValidConfiguration = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
+
+            _mockInvalidConfiguraton = new ConfigurationBuilder().Build();
         }
 
         [Fact]
@@ -34,6 +63,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageRouteRegistry>().Should().Be(true);
+
             container.Resolve<IMessageRouteRegistry>();
         }
 
@@ -47,6 +77,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageSerializer>().Should().Be(true);
+
             container.Resolve<IMessageSerializer>();
         }
 
@@ -60,6 +91,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMediator>().Should().Be(true);
+
             container.Resolve<IMediator>();
         }
 
@@ -76,15 +108,19 @@ namespace Eiffel.Messaging.Tests
             container.Resolve<IMediator>();
 
             container.IsRegistered<MockCommandHandler>().Should().Be(true);
+
             container.Resolve<MockCommandHandler>();
 
             container.IsRegistered<MockEventHandler>().Should().Be(true);
+
             container.Resolve<MockEventHandler>();
 
             container.IsRegistered<MockQueryHandler>().Should().Be(true);
+
             container.Resolve<MockQueryHandler>();
 
             container.IsRegistered<MockMessageHandler>().Should().Be(true);
+
             container.Resolve<MockMessageHandler>();
         }
 
@@ -98,12 +134,15 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMediator>().Should().Be(true);
+
             container.Resolve<IMediator>();
 
             container.IsRegistered<MockValidationPipeline>().Should().Be(true);
+
             container.Resolve<MockValidationPipeline>();
 
             container.IsRegistered<MockAuditLoggingPipeline>().Should().Be(true);
+
             container.Resolve<MockAuditLoggingPipeline>();
         }
 
@@ -111,9 +150,11 @@ namespace Eiffel.Messaging.Tests
         public void AddMessageBroker_Should_Register_MessageBroker_As_IMessageBrokerClient()
         {
             // Arrange
-            _containerBuilder.RegisterType<MessageRouteRegistry>().As<IMessageRouteRegistry>().SingleInstance();
+            _containerBuilder.RegisterInstance(_mockMessageRouteRegistry.Object);
+            
+            _containerBuilder.RegisterInstance(_mockMessageSerializer.Object);
 
-            _containerBuilder.RegisterType<DefaultMessageSerializer>().As<IMessageSerializer>();
+            _containerBuilder.RegisterInstance(_mockValidConfiguration);
 
             // Act
             _containerBuilder.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
@@ -122,21 +163,54 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageBrokerClient>().Should().Be(true);
+
             container.Resolve<IMessageBrokerClient>();
+        }
+
+        [Fact]
+        public void AddMessageBroker_Should_Throw_Exception_When_Configuraion_InValid()
+        {
+            // Arrange
+            _containerBuilder.RegisterInstance(_mockInvalidConfiguraton).As<IConfiguration>();
+
+            // Act
+            _containerBuilder.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
+
+            var container = _containerBuilder.Build();
+
+            Func<IMessageBrokerClient> sutResolve = () =>
+            {
+                ExceptionDispatchInfo dispatchInfo = null;
+                try
+                {
+                    return container.Resolve<IMessageBrokerClient>();
+                }
+                catch(Exception ex)
+                {
+                    dispatchInfo = ExceptionDispatchInfo.Capture(ex);
+                }
+
+                if (dispatchInfo != null)
+                {
+                    throw dispatchInfo.SourceException.InnerException;
+                }
+
+                return null;
+            };
+
+            // Assert
+            Assert.Throws<InvalidConfigurationException>(sutResolve);
         }
 
         [Fact]
         public void AddMessageBus_Should_Register_MessageBus_As_IMessageBus()
         {
             // Arrange
+            _containerBuilder.RegisterInstance(_mockMediator.Object);
 
-            _containerBuilder.AddMediator();
+            _containerBuilder.RegisterInstance(_mockMessageBrokerClient.Object);
 
-            _containerBuilder.RegisterType<MessageRouteRegistry>().As<IMessageRouteRegistry>().SingleInstance();
-
-            _containerBuilder.RegisterType<DefaultMessageSerializer>().As<IMessageSerializer>();
-
-            _containerBuilder.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
+            _containerBuilder.RegisterInstance(_mockValidConfiguration);
 
             // Act
             _containerBuilder.AddMessageBus();
@@ -145,6 +219,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageBus>().Should().Be(true);
+
             container.Resolve<IMessageBus>();
         }
 
@@ -152,13 +227,11 @@ namespace Eiffel.Messaging.Tests
         public void AddMessageBus_Should_Register_EventBus_As_IEventBus()
         {
             // Arrange
-            _containerBuilder.AddMediator();
+            _containerBuilder.RegisterInstance(_mockMediator.Object);
 
-            _containerBuilder.RegisterType<MessageRouteRegistry>().As<IMessageRouteRegistry>().SingleInstance();
+            _containerBuilder.RegisterInstance(_mockMessageBrokerClient.Object);
 
-            _containerBuilder.RegisterType<DefaultMessageSerializer>().As<IMessageSerializer>();
-
-            _containerBuilder.AddMessageBroker<MockBrokerClient, MockBrokerClientConfig>();
+            _containerBuilder.RegisterInstance(_mockValidConfiguration);
 
             // Act
             _containerBuilder.AddEventBus();
@@ -167,6 +240,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IEventBus>().Should().Be(true);
+
             container.Resolve<IEventBus>();
         }
 
@@ -174,7 +248,7 @@ namespace Eiffel.Messaging.Tests
         public void AddConsumerService_Should_Register_Service()
         {
             // Arrange
-            _containerBuilder.RegisterInstance(new Mock<IMessageBus>().Object);
+            _containerBuilder.RegisterInstance(_mockMessageBus.Object);
 
             // Act
             _containerBuilder.AddConsumerService<MockMessage>();
@@ -191,7 +265,7 @@ namespace Eiffel.Messaging.Tests
         public void AddConsumerServices_Should_Register_Service_ForEach_Message()
         {
             // Arrange
-            _containerBuilder.RegisterInstance(new Mock<IMessageBus>().Object);
+            _containerBuilder.RegisterInstance(_mockMessageBus.Object);
 
             // Act
             _containerBuilder.AddConsumerServices();

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>dotnet-Eiffel.Messaging.Samples.Kafka-5753D5C4-7671-4AD4-B80F-1B14F86A46B0</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+	  <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Eiffel.Messaging.Abstractions\Eiffel.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Eiffel.Messaging.DependencyInjection.Microsoft\Eiffel.Messaging.DependencyInjection.Microsoft.csproj" />
+    <ProjectReference Include="..\..\src\Eiffel.Messaging.Kafka\Eiffel.Messaging.Kafka.csproj" />
+  </ItemGroup>
+</Project>
