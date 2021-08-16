@@ -63,6 +63,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageRouteRegistry>().Should().Be(true);
+
             container.Resolve<IMessageRouteRegistry>();
         }
 
@@ -76,6 +77,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageSerializer>().Should().Be(true);
+
             container.Resolve<IMessageSerializer>();
         }
 
@@ -89,6 +91,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMediator>().Should().Be(true);
+
             container.Resolve<IMediator>();
         }
 
@@ -105,15 +108,19 @@ namespace Eiffel.Messaging.Tests
             container.Resolve<IMediator>();
 
             container.IsRegistered<MockCommandHandler>().Should().Be(true);
+
             container.Resolve<MockCommandHandler>();
 
             container.IsRegistered<MockEventHandler>().Should().Be(true);
+
             container.Resolve<MockEventHandler>();
 
             container.IsRegistered<MockQueryHandler>().Should().Be(true);
+
             container.Resolve<MockQueryHandler>();
 
             container.IsRegistered<MockMessageHandler>().Should().Be(true);
+
             container.Resolve<MockMessageHandler>();
         }
 
@@ -127,12 +134,15 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMediator>().Should().Be(true);
+
             container.Resolve<IMediator>();
 
             container.IsRegistered<MockValidationPipeline>().Should().Be(true);
+
             container.Resolve<MockValidationPipeline>();
 
             container.IsRegistered<MockAuditLoggingPipeline>().Should().Be(true);
+
             container.Resolve<MockAuditLoggingPipeline>();
         }
 
@@ -153,6 +163,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageBrokerClient>().Should().Be(true);
+
             container.Resolve<IMessageBrokerClient>();
         }
 
@@ -208,6 +219,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMessageBus>().Should().Be(true);
+
             container.Resolve<IMessageBus>();
         }
 
@@ -228,6 +240,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IEventBus>().Should().Be(true);
+
             container.Resolve<IEventBus>();
         }
 
