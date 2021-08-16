@@ -9,3 +9,7 @@
 ## Supported messaging platform
 
 ### Kafka
+
+## Extras
+
+## InMemory Message Broker Client
