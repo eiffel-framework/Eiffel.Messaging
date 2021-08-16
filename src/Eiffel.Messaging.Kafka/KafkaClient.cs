@@ -43,43 +43,42 @@ namespace Eiffel.Messaging.Kafka
         public virtual Task ConsumeAsync<TMessage>(Action<TMessage> dispatcher, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
-            using(var consumer = new ConsumerBuilder<Null, byte[]>(_config.ProducerConfig).Build())
+            using (var consumer = new ConsumerBuilder<Null, byte[]>(_config.ConsumerConfig).Build())
             {
                 var sourceTopic = _messageRouteRegistry.GetRoute<TMessage>();
 
                 consumer.Subscribe(sourceTopic);
 
-                var consumeTask = Task.Factory.StartNew(() =>
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    while (true)
+                    if (_cancellationTokenSource.IsCancellationRequested)
                     {
-                        if (_cancellationTokenSource.IsCancellationRequested)
-                        {
-                            consumer.Unsubscribe();
-                            throw new OperationCanceledException();
-                        }
-
-                        try
-                        {
-                            var consumeResult = consumer.Consume(cancellationToken);
-
-                            if (consumeResult.Message?.Value?.Length > 0)
-                            {
-                                var payload = _messageSerializer.Deserialize<TMessage>(consumeResult.Message.Value);
-
-                                dispatcher.Invoke(payload);
-                            }
-                        }
-                        catch (ConsumeException ex)
-                        {
-                            _logger.LogError(ex, $"{_config.Name} consume failed for {typeof(TMessage).Name} :: {sourceTopic}");
-                        }
+                        consumer.Unsubscribe();
+                        throw new OperationCanceledException();
                     }
 
-                }, cancellationToken);
+                    try
+                    {
+                        var consumeResult = consumer.Consume(cancellationToken);
 
-                return consumeTask;
+                        if (consumeResult.Message?.Value?.Length > 0)
+                        {
+                            var payload = _messageSerializer.Deserialize<TMessage>(consumeResult.Message.Value);
+
+                            dispatcher.Invoke(payload);
+
+                            consumer.Commit(consumeResult);
+                        }
+                    }
+                    catch (ConsumeException ex)
+                    {
+                        _logger.LogError(ex, $"{_config.Name} consume failed for {typeof(TMessage).Name} :: {sourceTopic}");
+                        consumer.Close();
+                    }
+                }
             }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -91,18 +90,21 @@ namespace Eiffel.Messaging.Kafka
         public virtual Task ProduceAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
-            var messageRoute = GetMessageRoute<TMessage>();
+            var targetTopic = GetMessageRoute<TMessage>();
 
             using (var producer = new ProducerBuilder<Null, byte[]>(_config.ProducerConfig).Build())
             {
                 var payload = new Message<Null, byte[]>()
                 {
                     Value = _messageSerializer.Serialize(message),
-                    Timestamp = new Timestamp(DateTime.UtcNow, TimestampType.LogAppendTime)
                 };
 
-                return producer.ProduceAsync(messageRoute, payload, cancellationToken);
+                producer.Produce(targetTopic, payload);
+
+                producer.Flush(cancellationToken);
             }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
