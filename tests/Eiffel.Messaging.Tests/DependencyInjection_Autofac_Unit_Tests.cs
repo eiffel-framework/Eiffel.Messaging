@@ -105,6 +105,7 @@ namespace Eiffel.Messaging.Tests
             var container = _containerBuilder.Build();
 
             container.IsRegistered<IMediator>().Should().Be(true);
+
             container.Resolve<IMediator>();
 
             container.IsRegistered<MockCommandHandler>().Should().Be(true);
@@ -137,13 +138,13 @@ namespace Eiffel.Messaging.Tests
 
             container.Resolve<IMediator>();
 
-            container.IsRegistered<MockValidationPipeline>().Should().Be(true);
+            container.IsRegistered<IPipelinePreProcessor>().Should().Be(true);
 
-            container.Resolve<MockValidationPipeline>();
+            container.Resolve<IPipelinePreProcessor>();
 
-            container.IsRegistered<MockAuditLoggingPipeline>().Should().Be(true);
+            container.IsRegistered<IPipelinePostProcessor>().Should().Be(true);
 
-            container.Resolve<MockAuditLoggingPipeline>();
+            container.Resolve<IPipelinePostProcessor>();
         }
 
         [Fact]

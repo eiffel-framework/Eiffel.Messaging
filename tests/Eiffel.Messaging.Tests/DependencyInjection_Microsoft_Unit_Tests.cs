@@ -100,13 +100,13 @@ namespace Eiffel.Messaging.Tests
 
             serviceProvider.GetService<IMediator>().Should().NotBeNull();
 
-            serviceProvider.GetService<MockCommandHandler>().Should().NotBeNull();
+            serviceProvider.GetService<ICommandHandler<MockCommand>>().Should().NotBeNull();
 
-            serviceProvider.GetService<MockEventHandler>().Should().NotBeNull();
+            serviceProvider.GetService<IEventHandler<MockEvent>>().Should().NotBeNull();
 
-            serviceProvider.GetService<MockQueryHandler>().Should().NotBeNull();
+            serviceProvider.GetService<IQueryHandler<MockQuery, MockQueryResponse>>().Should().NotBeNull();
 
-            serviceProvider.GetService<MockMessageHandler>().Should().NotBeNull();
+            serviceProvider.GetService<IMessageHandler<MockMessage>>().Should().NotBeNull();
 
         }
 
@@ -121,9 +121,9 @@ namespace Eiffel.Messaging.Tests
 
             serviceProvider.GetService<IMediator>().Should().NotBeNull();
 
-            serviceProvider.GetService<MockValidationPipeline>().Should().NotBeNull();
+            serviceProvider.GetService<IPipelinePreProcessor>().Should().NotBeNull();
 
-            serviceProvider.GetService<MockAuditLoggingPipeline>().Should().NotBeNull();
+            serviceProvider.GetService<IPipelinePostProcessor>().Should().NotBeNull();
         }
 
         [Fact]
