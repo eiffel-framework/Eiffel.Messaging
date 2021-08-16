@@ -1,15 +1,20 @@
 ﻿using Eiffel.Messaging.Abstractions;
-using System;
+using Eiffel.Messaging.Exceptions;
 
 namespace Eiffel.Messaging.Tests
 {
     public class MockBrokerClientConfig : IMessageBrokerClientConfig
     {
-        public string Name => "MockClient";
+        public string Name => "Mock";
+
+        public int? Count { get; set; }
 
         public void Validate()
         {
-            // Nothing
+            if (!Count.HasValue)
+            {
+                throw new InvalidConfigurationException($"{nameof(Count)} must be specified.");
+            }
         }
     }
 }

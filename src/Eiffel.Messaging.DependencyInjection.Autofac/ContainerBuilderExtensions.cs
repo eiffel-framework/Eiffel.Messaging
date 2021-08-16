@@ -1,12 +1,15 @@
-﻿using Autofac;
-using Eiffel.Messaging.Abstractions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+using Autofac;
+
+using Eiffel.Messaging.Abstractions;
 
 namespace Eiffel.Messaging.DependencyInjection.Autofac
 {
@@ -106,9 +109,9 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
             {
                 var configuration = context.Resolve<IConfiguration>();
 
-                configuration.Bind($"Eiffel:Messaging:{config.Name}", config);
+                configuration.Bind($"Messaging:{config.Name}", config);
 
-                config.Validate();
+                config?.Validate();
 
                 var logger = new LoggerFactory().CreateLogger<TClient>();
 
