@@ -20,10 +20,10 @@ namespace Eiffel.Messaging
         /// Send message 
         /// </summary>
         /// <exception cref="OperationCanceledException" />
-        public Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) 
+        public async Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
-            return _client.ProduceAsync(message, cancellationToken);
+            await _client.ProduceAsync(message, cancellationToken);
         }
 
         /// <summary>
@@ -35,7 +35,12 @@ namespace Eiffel.Messaging
         {
             return _client.ConsumeAsync<TMessage>(async (message) =>
             {
-                await _mediator.DispatchAsync(message, cancellationToken);
+                if (message is ICommand cmd)
+                    await _mediator.SendAsync(cmd, cancellationToken);
+                else if (message is IMessage msg)
+                    await _mediator.DispatchAsync(msg, cancellationToken);
+                else
+                    throw new ArgumentException($"{ nameof(TMessage) } must be implemented from ICommand or IMessage");
             }, cancellationToken);
         }
 
