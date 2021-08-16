@@ -20,10 +20,10 @@ namespace Eiffel.Messaging
         /// Send message 
         /// </summary>
         /// <exception cref="OperationCanceledException" />
-        public async Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) 
+        public Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) 
             where TMessage : class
         {
-            await _client.ProduceAsync(message, cancellationToken);
+            return _client.ProduceAsync(message, cancellationToken);
         }
 
         /// <summary>
