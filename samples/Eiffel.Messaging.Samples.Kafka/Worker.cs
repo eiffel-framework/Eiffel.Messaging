@@ -1,29 +1,34 @@
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Hosting;
+
+using Eiffel.Messaging.Abstractions;
 
 namespace Eiffel.Messaging.Samples.Kafka
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly IMessageBus _messageBus;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(IMessageBus messageBus)
         {
-            _logger = logger;
+            _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            await Task.Run(async () =>
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(1000, stoppingToken);
-            }
+                while (true)
+                {
+                    if (stoppingToken.IsCancellationRequested)
+                        break;
+
+                    await _messageBus.SendAsync(new CreateOrder() { UserId = Guid.NewGuid().ToString() });
+                }
+            }).ConfigureAwait(false);
         }
     }
 }
