@@ -9,7 +9,6 @@ using Confluent.Kafka;
 
 using Eiffel.Messaging.Abstractions;
 
-
 namespace Eiffel.Messaging.Kafka
 {
     public class KafkaClient : IMessageBrokerClient, IDisposable

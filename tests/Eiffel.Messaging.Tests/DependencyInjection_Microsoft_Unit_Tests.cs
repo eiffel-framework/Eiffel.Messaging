@@ -54,15 +54,29 @@ namespace Eiffel.Messaging.Tests
         }
 
         [Fact]
-        public void AddMessageRouteRegistry_Should_Register_MessageRouteRegistry_As_IMessageRouteRegistry()
+        public void AddMessageRoutes_Should_Register_MessageRouteRegistry_As_IMessageRouteRegistry()
         {
             // Act
-            _services.AddMessageRouteRegistry();
+            _services.AddMessageRoutes();
 
             // Assert
             var serviceProvider = _services.BuildServiceProvider();
 
             serviceProvider.GetService<IMessageRouteRegistry>().Should().NotBeNull();
+        }
+
+        [Fact]
+        public void AddMessageRoutes_Should_Register_MessageRoutes_Via_Attributes()
+        {
+            // Act
+            _services.AddMessageRoutes();
+
+            // Assert
+            var serviceProvider = _services.BuildServiceProvider();
+
+            var registry = serviceProvider.GetService<IMessageRouteRegistry>();
+
+            registry.GetRoute<MockMessage>().Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
