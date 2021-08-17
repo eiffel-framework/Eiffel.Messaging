@@ -2,6 +2,7 @@
 
 namespace Eiffel.Messaging.Tests
 {
+    [MessageRoute("mock-message-route")]
     public class MockMessage : IMessage
     {
         public MockMessage()

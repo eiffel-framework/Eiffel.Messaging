@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Eiffel.Messaging.Abstractions;
+using System.Collections.Generic;
 
 namespace Eiffel.Messaging.DependencyInjection.Microsoft
 {
@@ -37,9 +38,14 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
             return services;
         }
 
-        public static IServiceCollection AddMessageRouteRegistry(this IServiceCollection services)
+        public static IServiceCollection AddMessageRoutes(this IServiceCollection services, Assembly[] assemblies = null)
         {
-            services.AddSingleton<IMessageRouteRegistry, MessageRouteRegistry>();
+            var messageRoutes = GetMessageRoutesFromAssemblies(assemblies);
+
+            services.AddSingleton<IMessageRouteRegistry>(serviceProvider =>
+            {
+                return new MessageRouteRegistry(messageRoutes);
+            });
 
             return services;
         }
@@ -166,11 +172,7 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
                     .ToArray();
             }
 
-            var messageTypes = assemblies.SelectMany(x => x.GetTypes().Where(x =>
-                            (x.IsAssignableTo(typeof(IMessage)) ||
-                             x.IsAssignableTo(typeof(ICommand)) ||
-                             x.IsAssignableTo(typeof(IEvent)) ||
-                             x.IsAssignableTo(typeof(IQuery<>))) && x.IsClass));
+            var messageTypes = GetMessageTypesFromAssemblies(assemblies);
 
             foreach (var messageType in messageTypes)
             {
@@ -180,6 +182,39 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
             }
 
             return services;
+        }
+
+        private static Dictionary<Type, string> GetMessageRoutesFromAssemblies(Assembly[] assemblies = null)
+        {
+            var messageRoutes = new Dictionary<Type, string>();
+
+            if (assemblies == null)
+            {
+                assemblies = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.TopDirectoryOnly)
+                    .Select(Assembly.LoadFrom)
+                    .ToArray();
+            }
+
+            var messageTypes = GetMessageTypesFromAssemblies(assemblies);
+
+            messageTypes.ForEach(x =>
+            {
+                var messageRouteAttribute = x.GetCustomAttribute<MessageRouteAttribute>();
+
+                if (messageRoutes.ContainsKey(x) || messageRouteAttribute == null) return;
+
+                messageRoutes.Add(x, messageRouteAttribute.Route);
+            });
+
+            return messageRoutes;
+        }
+
+        private static List<Type> GetMessageTypesFromAssemblies(Assembly[] assemblies)
+        {
+            return assemblies.SelectMany(x => x.GetTypes().Where(x =>
+                           (x.IsAssignableTo(typeof(IMessage)) ||
+                            x.IsAssignableTo(typeof(ICommand)) ||
+                            x.IsAssignableTo(typeof(IEvent))) && x.IsClass)).ToList() ?? new List<Type>();
         }
     }
 }

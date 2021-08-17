@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 
-using Eiffel.Messaging.Abstractions;
 using Eiffel.Messaging.DependencyInjection.Autofac;
 using Eiffel.Messaging.InMemory;
 
@@ -29,10 +28,6 @@ namespace Eiffel.Messaging.Samples.InMemory
                 var logger = serviceHost.Services.GetRequiredService<ILogger<Program>>();
                 logger.LogError((Exception)exception.ExceptionObject, "UnhandledException");
             };
-
-            var registry = serviceHost.Services.GetAutofacRoot().Resolve<IMessageRouteRegistry>();
-
-            registry.Register<Notification>("sample-route");
 
             await serviceHost.RunAsync();
         }
@@ -61,7 +56,7 @@ namespace Eiffel.Messaging.Samples.InMemory
         private static void ConfigureContainer(HostBuilderContext builderContext, ContainerBuilder builder)
         {
             builder.AddMediator();
-            builder.AddMessageRouteRegistry();
+            builder.AddMessageRoutes();
             builder.AddMessageSerializer();
             builder.AddMessageBroker<InMemoryClient, InMemoryClientConfig>();
             builder.AddMessageBus();

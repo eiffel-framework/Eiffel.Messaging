@@ -14,6 +14,14 @@ namespace Eiffel.Messaging
             MessageRoutes = new List<Tuple<Type, string>>();
         }
 
+        public MessageRouteRegistry(Dictionary<Type, string> routes) : this()
+        {
+            foreach(var route in routes)
+            {
+                Register(route.Value, route.Key);
+            }
+        }
+
         public virtual string GetRoute<TMessage>() where TMessage : class
         {
             var messageRoute = MessageRoutes.SingleOrDefault(x => x.Item1 == typeof(TMessage));
@@ -37,6 +45,11 @@ namespace Eiffel.Messaging
             {
                 Register(route, messageType);
             }
+        }
+
+        public virtual void Register(Type type, string route)
+        {
+            Register(route, type);
         }
 
         public virtual HashSet<Tuple<Type, string>> Routes
