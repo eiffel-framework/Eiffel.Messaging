@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Eiffel.Messaging.Samples.InMemory
 {
-    [MessageRoute("sample-route")]
+    [Message("sample-route")]
     public class Notification : IMessage
     {
         public Notification(string message)

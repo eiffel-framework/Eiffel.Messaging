@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Eiffel.Messaging.Samples.Kafka
 {
-    [MessageRoute("ORDERS")]
+    [Message("ORDERS")]
     public class CreateOrder : ICommand
     {
         public string UserId { get; set; }

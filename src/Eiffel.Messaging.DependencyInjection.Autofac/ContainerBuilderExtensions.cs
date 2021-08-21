@@ -202,7 +202,7 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
 
             messageTypes.ForEach(x =>
             {
-                var messageRouteAttribute = x.GetCustomAttribute<MessageRouteAttribute>();
+                var messageRouteAttribute = x.GetCustomAttribute<MessageAttribute>();
 
                 if (messageRoutes.ContainsKey(x) || messageRouteAttribute == null) return;
 
