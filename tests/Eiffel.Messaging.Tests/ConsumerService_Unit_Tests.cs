@@ -25,6 +25,7 @@ namespace Eiffel.Messaging.Tests
         [Fact]
         public async Task ConsumerService_Should_ConsumeMessages_When_Service_Started()
         {
+            // Arrange
             _mockMessageBus.Setup(x => x.SubscribeAsync<MockMessage>(It.IsAny<CancellationToken>()));
 
             // Act

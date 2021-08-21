@@ -66,7 +66,6 @@ namespace Eiffel.Messaging.Tests
 
             await Task.Delay(2000);
 
-            // Arrange
             MockEvent result = null;
 
             // Act
