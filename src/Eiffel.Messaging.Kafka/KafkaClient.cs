@@ -14,7 +14,7 @@ namespace Eiffel.Messaging.Kafka
     public class KafkaClient : IMessageBrokerClient, IDisposable
     {
         private readonly ILogger<KafkaClient> _logger;
-        private readonly IMessageRouteRegistry _messageRouteRegistry;
+        private readonly IMessageRegistry _messageRouteRegistry;
         private readonly IMessageSerializer _messageSerializer;
 
         private readonly KafkaClientConfig _config;
@@ -22,7 +22,7 @@ namespace Eiffel.Messaging.Kafka
 
         public KafkaClient(ILogger<KafkaClient> logger, 
             KafkaClientConfig config, 
-            IMessageRouteRegistry messageRouteRegistry,
+            IMessageRegistry messageRouteRegistry,
             IMessageSerializer messageSerializer)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -39,7 +39,7 @@ namespace Eiffel.Messaging.Kafka
 
         /// <summary>
         /// Consume message from message broker
-        /// <seealso cref="IMessageRouteRegistry"/>
+        /// <seealso cref="IMessageRegistry"/>
         /// </summary>
         /// <exception cref="OperationCanceledException" />
         /// <exception cref="ConsumeException" />
@@ -86,7 +86,7 @@ namespace Eiffel.Messaging.Kafka
 
         /// <summary>
         /// Sends message to message broker
-        /// <seealso cref="IMessageRouteRegistry"/>
+        /// <seealso cref="IMessageRegistry"/>
         /// </summary>
         /// <exception cref="OperationCanceledException" />
         /// <exception cref="ProduceException{TKey, TValue}" />

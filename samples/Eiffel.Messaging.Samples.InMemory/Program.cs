@@ -12,6 +12,8 @@ using Autofac.Extensions.DependencyInjection;
 
 using Eiffel.Messaging.DependencyInjection.Autofac;
 using Eiffel.Messaging.InMemory;
+using Eiffel.Messaging.Abstractions;
+using System.Reflection;
 
 namespace Eiffel.Messaging.Samples.InMemory
 {
@@ -55,12 +57,15 @@ namespace Eiffel.Messaging.Samples.InMemory
 
         private static void ConfigureContainer(HostBuilderContext builderContext, ContainerBuilder builder)
         {
+            var assembly = Assembly.GetExecutingAssembly();
+
             builder.AddMediator();
-            builder.AddMessageRoutes();
+            builder.AddMessageRegistry();
             builder.AddMessageSerializer();
             builder.AddMessageBroker<InMemoryClient, InMemoryClientConfig>();
             builder.AddMessageBus();
-            builder.AddConsumerServices();
+            builder.RegisterMessages<IMessage>(new[] { assembly });
+            builder.AddConsumerServices<IMessage>(new[] { assembly });
 
             builder.RegisterType<Worker>()
                 .As<IHostedService>()

@@ -2,6 +2,7 @@
 
 namespace Eiffel.Messaging.Tests
 {
+    [Message(Route = "mock-event")]
     public class MockEvent : IEvent
     {
         public MockEvent()

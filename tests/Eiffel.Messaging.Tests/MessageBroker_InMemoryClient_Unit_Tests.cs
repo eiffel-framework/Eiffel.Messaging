@@ -1,61 +1,35 @@
-﻿using Eiffel.Messaging.Abstractions;
-using Eiffel.Messaging.InMemory;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Moq;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Logging;
+
+using Moq;
 using Xunit;
+using FluentAssertions;
+
+using Eiffel.Messaging.InMemory;
+using Eiffel.Messaging.Abstractions;
 
 namespace Eiffel.Messaging.Tests
 {
     public class MessageBroker_InMemoryClient_Unit_Tests
     {
         private readonly IMessageBrokerClient _client;
-        private readonly IMessageRouteRegistry _messageRouteRegistry;
+        private readonly IMessageRegistry _messageRouteRegistry;
 
         private const string Name = "Eiffel";
         private const int EventId = 1;
 
         public MessageBroker_InMemoryClient_Unit_Tests()
         {
-            _messageRouteRegistry = new MessageRouteRegistry();
+            _messageRouteRegistry = new MessageRegistry();
 
             _client = new InMemoryClient(new Mock<ILogger<InMemoryClient>>().Object, new InMemoryClientConfig(), _messageRouteRegistry, new DefaultMessageSerializer());
 
-            _messageRouteRegistry.Register<MockEvent>("mock-event-route");
+            _messageRouteRegistry.Register<MockEvent>();
 
             _client.ProduceAsync(new MockEvent(EventId));
-        }
-
-        [Fact]
-        public async Task Consume_Should_Throw_Exception_When_MessageRoute_IsMissing()
-        {
-            // Arrange
-            MockMessage result = null;
-
-            // Act
-            Func<Task> sutConsume = () => _client.ConsumeAsync<MockMessage>((message) =>
-            {
-                result = message;
-            }, default);
-
-            // Assert
-            await Assert.ThrowsAsync<MessageRouteNotFoundException>(sutConsume);
-        }
-
-        [Fact]
-        public async Task Produce_Should_Throw_Exception_When_MessageRoute_IsMissing()
-        {
-            // Arrange
-            var message = new MockMessage(Name);
-
-            // Act
-            Func<Task> sutConsume = () => _client.ProduceAsync(message);
-
-            // Assert
-            await Assert.ThrowsAsync<MessageRouteNotFoundException>(sutConsume);
         }
 
         [Fact]
@@ -100,7 +74,7 @@ namespace Eiffel.Messaging.Tests
             var message = new MockMessage(Name);
             MockMessage result = null;
 
-            _messageRouteRegistry.Register<MockMessage>("mock-meesage-route");
+            _messageRouteRegistry.Register<MockMessage>();
 
             await _client.ProduceAsync(message);
 

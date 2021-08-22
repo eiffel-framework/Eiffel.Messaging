@@ -11,7 +11,7 @@ namespace Eiffel.Messaging.Tests
         public MockBrokerClient(
             Logger<MockBrokerClient> logger,
             MockBrokerClientConfig config,
-            IMessageRouteRegistry messageRouteRegistry,
+            IMessageRegistry messageRouteRegistry,
             IMessageSerializer messageSerializer)
         {
         }

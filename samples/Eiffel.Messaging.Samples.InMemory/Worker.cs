@@ -23,7 +23,7 @@ namespace Eiffel.Messaging.Samples.InMemory
             int i = 1;
             while (!stoppingToken.IsCancellationRequested)
             {
-                await _messageBus.SendAsync(new Notification($"Hello World {i} !")).ConfigureAwait(false);
+                await _messageBus.SendAsync(new Hello($"Hello World {i} !")).ConfigureAwait(false);
                 i++;
             }
         }

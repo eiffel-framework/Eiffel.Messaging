@@ -5,23 +5,22 @@ using System.Threading.Tasks;
 
 namespace Eiffel.Messaging.Samples.InMemory
 {
-    [Message("sample-route")]
-    public class Notification : IMessage
+    [Message(Route = "sample-route")]
+    public class Hello : IMessage
     {
-        public Notification(string message)
+        public Hello(string message)
         {
             Message = message;
         }
         public string Message { get; }
     }
 
-    public class MessageHandler : IMessageHandler<Notification>
+    public class MessageHandler : IMessageHandler<Hello>
     {
-        public async Task HandleAsync(Notification payload, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(Hello payload, CancellationToken cancellationToken = default)
         {
             await Console.Out.WriteLineAsync(payload.Message);
         }
     }
-
    
 }

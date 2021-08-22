@@ -18,6 +18,12 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
     {
         /// <summary>
         /// Register mediator with handlers and pipelines
+        /// Mediator dispatch messages to handlers
+        /// <seealso cref="IEventHandler{TPayload}"/>
+        /// <seealso cref="IMessageHandler{TPayload}"/>
+        /// <seealso cref="ICommandHandler{TPayload}"/>
+        /// <seealso cref="ICommandHandler{TPayload, TRetVal}"/>
+        /// <seealso cref="IQueryHandler{TPayload, TResult}"/>
         /// </summary>
         public static ContainerBuilder AddMediator(this ContainerBuilder builder, Assembly[] assemblies = null)
         {
@@ -42,7 +48,181 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
             return builder;
         }
 
-        public static ContainerBuilder RegisterHandlers(this ContainerBuilder builder, Assembly[] assemblies = null)
+        /// <summary>
+        /// Registers MessageSerializer
+        /// Default message serializer Utf8JSON
+        /// </summary>
+        public static ContainerBuilder AddMessageSerializer(this ContainerBuilder builder)
+        {
+            builder.RegisterType<DefaultMessageSerializer>()
+                .As<IMessageSerializer>()
+                .SingleInstance();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers custom message serializer
+        /// </summary>
+        /// <typeparam name="TSerializer">Custom IMessageSerializer implementation</typeparam>
+        public static ContainerBuilder AddMessageSerializer<TSerializer>(this ContainerBuilder builder)
+            where TSerializer : IMessageSerializer
+        {
+            builder.RegisterType<TSerializer>()
+               .As<IMessageSerializer>()
+               .SingleInstance();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers MessageRegistry
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static ContainerBuilder AddMessageRegistry(this ContainerBuilder builder)
+        {
+            builder.RegisterType<MessageRegistry>()
+                   .As<IMessageRegistry>()
+                   .SingleInstance();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers messages
+        /// Pass generic parameter which messages inherited base class or implemented intraface
+        /// <see cref="MessageAttribute"/>
+        /// <seealso cref="IMessage"/>
+        /// <seealso cref="ICommand"/>
+        /// <seealso cref="IEvent"/>
+        /// </summary>
+        public static ContainerBuilder RegisterMessages<T>(this ContainerBuilder builder, Assembly[] assemblies)
+        {
+            var messageTypes = GetMessageTypesFromAssemblies<T>(assemblies);
+
+            var metadataCollection = messageTypes.ToDictionary(x => x, x => x.GetCustomAttribute<MessageAttribute>().GetMetadata());
+
+            builder.RegisterBuildCallback(lifetimeScope =>
+            {
+                var registry = lifetimeScope.Resolve<IMessageRegistry>();
+
+                messageTypes.ForEach(messageType =>
+                {
+                    registry.Register(messageType, metadataCollection[messageType]);
+                });
+
+            });
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers message brokeer client with configuration
+        /// Configuration must be specified appsettings.json under the Messaging section
+        /// Messaging must contains broker configuration with name Messaging:Kafka, Messaging:RabbitMQ etc.
+        /// After binding validates configuration for misconceptions
+        /// </summary>
+        public static ContainerBuilder AddMessageBroker<TClient, TConfig>(this ContainerBuilder builder)
+            where TClient : IMessageBrokerClient
+            where TConfig : IMessageBrokerClientConfig
+        {
+            var clientConfig = Activator.CreateInstance<TConfig>();
+
+            builder.Register(context =>
+            {
+                var configuration = context.Resolve<IConfiguration>();
+
+                configuration.Bind($"Messaging:{clientConfig.Name}", clientConfig);
+
+                clientConfig?.Validate();
+
+                var logger = new LoggerFactory().CreateLogger<TClient>();
+
+                var registry = context.Resolve<IMessageRegistry>();
+
+                var serializer = context.Resolve<IMessageSerializer>();
+
+                return Activator.CreateInstance(typeof(TClient), new object[] { logger, clientConfig, registry, serializer });
+            }).As<IMessageBrokerClient>()
+              .SingleInstance();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Resgisters MessageBus
+        /// Messages bus uses specified message broker
+        /// </summary>
+        public static ContainerBuilder AddMessageBus(this ContainerBuilder builder)
+        {
+            builder.RegisterType<MessageBus>()
+                   .As<IMessageBus>()
+                   .SingleInstance();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Resgisters EventBus
+        /// Event bus uses specified message broker
+        /// </summary>
+        public static ContainerBuilder AddEventBus(this ContainerBuilder builder)
+        {
+            builder.RegisterType<EventBus>()
+                   .As<IEventBus>()
+                   .SingleInstance();
+            
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers ConsumerService
+        /// Consumer services uses Event and Message bus
+        /// </summary>
+        public static ContainerBuilder AddConsumerService<TMessage>(this ContainerBuilder builder)
+            where TMessage : class
+        {
+            builder.RegisterType<ConsumerService<TMessage>>()
+                   .As<IHostedService>()
+                   .InstancePerDependency();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers ConsumerService
+        /// Consumer service for each message which messages inherited base class or implemented intraface
+        /// </summary>
+        public static ContainerBuilder AddConsumerServices<T>(this ContainerBuilder builder, Assembly[] assemblies)
+        {
+
+            var messageTypes = GetMessageTypesFromAssemblies<T>(assemblies);
+
+            messageTypes.ForEach(messageType =>
+            {
+                var consumerService = typeof(ConsumerService<>).MakeGenericType(messageType);
+
+                builder.RegisterType(consumerService)
+                       .InstancePerDependency()
+                       .As<IHostedService>();
+            });
+
+            return builder;
+        }
+
+        private static List<Type> GetMessageTypesFromAssemblies<T>(Assembly[] assemblies)
+        {
+            List<Type> messageTypes = new List<Type>();
+
+            if (typeof(T).IsClass && typeof(T).IsAbstract)
+                messageTypes.AddRange(assemblies.SelectMany(x => x.GetTypes().Where(x => x.BaseType == typeof(T))));
+            else
+                messageTypes.AddRange(assemblies.SelectMany(x => x.GetTypes().Where(x => x.IsAssignableTo(typeof(T)) && x.IsClass)));
+
+            return messageTypes;
+        }
+
+        private static ContainerBuilder RegisterHandlers(this ContainerBuilder builder, Assembly[] assemblies = null)
         {
             builder.RegisterAssemblyTypes(assemblies)
                .AsClosedTypesOf(typeof(ICommandHandler<>))
@@ -67,7 +247,7 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
             return builder;
         }
 
-        public static ContainerBuilder RegisterPipelines(this ContainerBuilder builder, Assembly[] assemblies = null)
+        private static ContainerBuilder RegisterPipelines(this ContainerBuilder builder, Assembly[] assemblies = null)
         {
             builder.RegisterAssemblyTypes(assemblies)
                .AssignableTo(typeof(IPipelinePreProcessor))
@@ -80,144 +260,6 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
                .SingleInstance();
 
             return builder;
-        }
-
-        public static ContainerBuilder AddMessageRoutes(this ContainerBuilder builder, Assembly[] assemblies = null)
-        {
-            var messageRoutes = GetMessageRoutesFromAssemblies(assemblies);
-
-            builder.Register(x =>
-            {
-                return new MessageRouteRegistry(messageRoutes);
-            }).As<IMessageRouteRegistry>().SingleInstance();
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddMessageSerializer(this ContainerBuilder builder)
-        {
-            builder.RegisterType<DefaultMessageSerializer>()
-                .As<IMessageSerializer>()
-                .SingleInstance();
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddMessageBroker<TClient, TConfig>(this ContainerBuilder builder)
-            where TClient : IMessageBrokerClient
-            where TConfig : IMessageBrokerClientConfig
-        {
-            var config = Activator.CreateInstance<TConfig>();
-
-            builder.Register(context =>
-            {
-                var configuration = context.Resolve<IConfiguration>();
-
-                configuration.Bind($"Messaging:{config.Name}", config);
-
-                config?.Validate();
-
-                var logger = new LoggerFactory().CreateLogger<TClient>();
-
-                var registry = context.Resolve<IMessageRouteRegistry>();
-
-                var serializer = context.Resolve<IMessageSerializer>();
-
-                return Activator.CreateInstance(typeof(TClient), new object[] { logger, config, registry, serializer });
-            }).As<IMessageBrokerClient>().SingleInstance();
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddMessageBus(this ContainerBuilder builder)
-        {
-            builder.Register(context =>
-            {
-                var mediator = context.Resolve<IMediator>();
-
-                var client = context.Resolve<IMessageBrokerClient>();
-
-                return new MessageBus(mediator, client);
-            }).As<IMessageBus>().SingleInstance();
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddEventBus(this ContainerBuilder builder)
-        {
-            builder.Register(context =>
-            {
-                var mediator = context.Resolve<IMediator>();
-
-                var client = context.Resolve<IMessageBrokerClient>();
-
-                return new EventBus(mediator, client);
-            }).As<IEventBus>().SingleInstance();
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddConsumerService<TMessage>(this ContainerBuilder builder)
-            where TMessage : class
-        {
-            builder.RegisterType<ConsumerService<TMessage>>()
-                .InstancePerDependency()
-                .As<IHostedService>();
-
-            return builder;
-        }
-
-        public static ContainerBuilder AddConsumerServices(this ContainerBuilder builder, Assembly[] assemblies = null)
-        {
-            if (assemblies == null)
-            {
-                assemblies = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.TopDirectoryOnly)
-                    .Select(Assembly.LoadFrom)
-                    .ToArray();
-            }
-
-            var messageTypes = GetMessageTypesFromAssemblies(assemblies);
-
-            foreach(var messageType in messageTypes)
-            {
-                var consumerService = typeof(ConsumerService<>).MakeGenericType(messageType);
-                builder.RegisterType(consumerService).InstancePerDependency().As<IHostedService>();
-            }
-
-            return builder;
-        }
-
-        private static Dictionary<Type, string> GetMessageRoutesFromAssemblies(Assembly[] assemblies = null)
-        {
-            var messageRoutes = new Dictionary<Type, string>();
-
-            if (assemblies == null)
-            {
-                assemblies = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.TopDirectoryOnly)
-                    .Select(Assembly.LoadFrom)
-                    .ToArray();
-            }
-
-            var messageTypes = GetMessageTypesFromAssemblies(assemblies);
-
-            messageTypes.ForEach(x =>
-            {
-                var messageRouteAttribute = x.GetCustomAttribute<MessageAttribute>();
-
-                if (messageRoutes.ContainsKey(x) || messageRouteAttribute == null) return;
-
-                messageRoutes.Add(x, messageRouteAttribute.Route);
-            });
-
-            return messageRoutes;
-        }
-
-        private static List<Type> GetMessageTypesFromAssemblies(Assembly[] assemblies)
-        {
-            return assemblies.SelectMany(x => x.GetTypes().Where(x =>
-                           (x.IsAssignableTo(typeof(IMessage)) ||
-                            x.IsAssignableTo(typeof(ICommand)) ||
-                            x.IsAssignableTo(typeof(IEvent))) && x.IsClass)).ToList() ?? new List<Type>();
         }
     }
 }

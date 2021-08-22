@@ -9,6 +9,8 @@ namespace Eiffel.Messaging.InMemory
 
         public int Capacity { get; set; } = 128;
 
+        public int BackpressureInMs { get; set; } = 0;
+
         public void Validate()
         {
             if (string.IsNullOrWhiteSpace(Name))

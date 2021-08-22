@@ -7,8 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using Eiffel.Messaging.DependencyInjection.Microsoft;
 using Eiffel.Messaging.Kafka;
+using Eiffel.Messaging.DependencyInjection.Microsoft;
+using Eiffel.Messaging.Abstractions;
+using System.Reflection;
 
 namespace Eiffel.Messaging.Samples.Kafka
 {
@@ -26,6 +28,7 @@ namespace Eiffel.Messaging.Samples.Kafka
                 logger.LogError((Exception)exception.ExceptionObject, "UnhandledException");
             };
 
+            //var s = serviceHost.Services.GetRequiredService<IMessageRegistry>();
             await serviceHost.RunAsync();
         }
 
@@ -52,7 +55,8 @@ namespace Eiffel.Messaging.Samples.Kafka
         public static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
             services.AddMediator();
-            services.AddMessageRoutes();
+            services.AddMessageRegistry();
+            services.RegisterMessages<ICommand>(new[] { Assembly.GetExecutingAssembly() });
             services.AddMessageSerializer();
             services.AddMessageBroker<KafkaClient, KafkaClientConfig>();
             services.AddMessageBus();

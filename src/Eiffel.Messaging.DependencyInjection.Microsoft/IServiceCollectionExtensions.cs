@@ -3,10 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using Eiffel.Messaging.Abstractions;
 using System.Collections.Generic;
@@ -38,14 +39,30 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
             return services;
         }
 
-        public static IServiceCollection AddMessageRoutes(this IServiceCollection services, Assembly[] assemblies = null)
-        {
-            var messageRoutes = GetMessageRoutesFromAssemblies(assemblies);
 
-            services.AddSingleton<IMessageRouteRegistry>(serviceProvider =>
+        public static IServiceCollection AddMessageRegistry(this IServiceCollection services)
+        {
+            services.AddSingleton<IMessageRegistry, MessageRegistry>();
+
+            return services;
+        }
+
+        public static IServiceCollection RegisterMessages<T>(this IServiceCollection services, Assembly[] assemblies)
+        {
+            var messageTypes = GetMessageTypesFromAssemblies<T>(assemblies);
+
+            var metadataCollection = messageTypes.ToDictionary(x => x, x => x.GetCustomAttribute<MessageAttribute>().GetMetadata());
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            var registry = serviceProvider.GetRequiredService<IMessageRegistry>();
+
+            messageTypes.ForEach(messageType =>
             {
-                return new MessageRouteRegistry(messageRoutes);
+                registry.Register(messageType, metadataCollection[messageType]);
             });
+
+            services.Replace(new ServiceDescriptor(typeof(IMessageRegistry), registry));
 
             return services;
         }
@@ -118,7 +135,7 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
 
                 var logger = new LoggerFactory().CreateLogger<TClient>();
 
-                var registry = serviceProvider.GetRequiredService<IMessageRouteRegistry>();
+                var registry = serviceProvider.GetRequiredService<IMessageRegistry>();
 
                 var serializer = serviceProvider.GetRequiredService<IMessageSerializer>();
 
@@ -163,7 +180,7 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
             return services;
         }
 
-        public static IServiceCollection AddConsumerServices(this IServiceCollection services, Assembly[] assemblies = null)
+        public static IServiceCollection AddConsumerServices<T>(this IServiceCollection services, Assembly[] assemblies)
         {
             if (assemblies == null)
             {
@@ -172,7 +189,7 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
                     .ToArray();
             }
 
-            var messageTypes = GetMessageTypesFromAssemblies(assemblies);
+            var messageTypes = GetMessageTypesFromAssemblies<T>(assemblies);
 
             foreach (var messageType in messageTypes)
             {
@@ -184,37 +201,16 @@ namespace Eiffel.Messaging.DependencyInjection.Microsoft
             return services;
         }
 
-        private static Dictionary<Type, string> GetMessageRoutesFromAssemblies(Assembly[] assemblies = null)
+        private static List<Type> GetMessageTypesFromAssemblies<T>(Assembly[] assemblies)
         {
-            var messageRoutes = new Dictionary<Type, string>();
+            List<Type> messageTypes = new List<Type>();
 
-            if (assemblies == null)
-            {
-                assemblies = Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll", SearchOption.TopDirectoryOnly)
-                    .Select(Assembly.LoadFrom)
-                    .ToArray();
-            }
+            if (typeof(T).IsClass && typeof(T).IsAbstract)
+                messageTypes.AddRange(assemblies.SelectMany(x => x.GetTypes().Where(x => x.BaseType == typeof(T))));
+            else
+                messageTypes.AddRange(assemblies.SelectMany(x => x.GetTypes().Where(x => x.IsAssignableTo(typeof(T)) && x.IsClass)));
 
-            var messageTypes = GetMessageTypesFromAssemblies(assemblies);
-
-            messageTypes.ForEach(x =>
-            {
-                var messageRouteAttribute = x.GetCustomAttribute<MessageAttribute>();
-
-                if (messageRoutes.ContainsKey(x) || messageRouteAttribute == null) return;
-
-                messageRoutes.Add(x, messageRouteAttribute.Route);
-            });
-
-            return messageRoutes;
-        }
-
-        private static List<Type> GetMessageTypesFromAssemblies(Assembly[] assemblies)
-        {
-            return assemblies.SelectMany(x => x.GetTypes().Where(x =>
-                           (x.IsAssignableTo(typeof(IMessage)) ||
-                            x.IsAssignableTo(typeof(ICommand)) ||
-                            x.IsAssignableTo(typeof(IEvent))) && x.IsClass)).ToList() ?? new List<Type>();
+            return messageTypes;
         }
     }
 }

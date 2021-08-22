@@ -14,6 +14,7 @@ using FluentAssertions;
 using Eiffel.Messaging.Abstractions;
 using Eiffel.Messaging.DependencyInjection.Autofac;
 using Eiffel.Messaging.Exceptions;
+using System.Reflection;
 
 namespace Eiffel.Messaging.Tests
 {
@@ -22,7 +23,7 @@ namespace Eiffel.Messaging.Tests
         private readonly ContainerBuilder _containerBuilder;
 
         private readonly Mock<IMessageBrokerClient> _mockMessageBrokerClient;
-        private readonly Mock<IMessageRouteRegistry> _mockMessageRouteRegistry;
+        private readonly Mock<IMessageRegistry> _mockMessageRegistry;
         private readonly Mock<IMessageSerializer> _mockMessageSerializer;
         private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<IMessageBus> _mockMessageBus;
@@ -33,7 +34,7 @@ namespace Eiffel.Messaging.Tests
         {
             _containerBuilder = new ContainerBuilder();
 
-            _mockMessageRouteRegistry = new Mock<IMessageRouteRegistry>();
+            _mockMessageRegistry = new Mock<IMessageRegistry>();
 
             _mockMessageSerializer = new Mock<IMessageSerializer>();
 
@@ -54,29 +55,32 @@ namespace Eiffel.Messaging.Tests
         }
 
         [Fact]
-        public void AddMessageRoutes_Should_Register_MessageRouteRegistry_As_IMessageRouteRegistry()
+        public void AddMessageRegistry_Should_Register_MessageRouteRegistry_As_IMessageRouteRegistry()
         {
             // Act
-            _containerBuilder.AddMessageRoutes();
+            _containerBuilder.AddMessageRegistry();
 
             // Assert
             var container = _containerBuilder.Build();
 
-            container.IsRegistered<IMessageRouteRegistry>().Should().Be(true);
+            container.IsRegistered<IMessageRegistry>().Should().Be(true);
 
-            container.Resolve<IMessageRouteRegistry>();
+            container.Resolve<IMessageRegistry>();
         }
 
         [Fact]
-        public void AddMessageRoutes_Should_Register_MessageRoutes_Via_Attributes()
+        public void RegisterMessages_Should_Register_Messages()
         {
+            // Arrange
+            _containerBuilder.AddMessageRegistry();
+
             // Act
-            _containerBuilder.AddMessageRoutes();
+            _containerBuilder.RegisterMessages<IMessage>(new[] { Assembly.GetExecutingAssembly() });
 
             // Assert
             var container = _containerBuilder.Build();
 
-            var registry = container.Resolve<IMessageRouteRegistry>();
+            var registry = container.Resolve<IMessageRegistry>();
 
             registry.GetRoute<MockMessage>().Should().NotBeNullOrWhiteSpace();
         }
@@ -165,8 +169,8 @@ namespace Eiffel.Messaging.Tests
         public void AddMessageBroker_Should_Register_MessageBroker_As_IMessageBrokerClient()
         {
             // Arrange
-            _containerBuilder.RegisterInstance(_mockMessageRouteRegistry.Object);
-            
+            _containerBuilder.RegisterInstance(_mockMessageRegistry.Object);
+
             _containerBuilder.RegisterInstance(_mockMessageSerializer.Object);
 
             _containerBuilder.RegisterInstance(_mockValidConfiguration);
@@ -200,7 +204,7 @@ namespace Eiffel.Messaging.Tests
                 {
                     return container.Resolve<IMessageBrokerClient>();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     dispatchInfo = ExceptionDispatchInfo.Capture(ex);
                 }
@@ -283,7 +287,9 @@ namespace Eiffel.Messaging.Tests
             _containerBuilder.RegisterInstance(_mockMessageBus.Object);
 
             // Act
-            _containerBuilder.AddConsumerServices();
+            _containerBuilder.AddConsumerService<IMessage>();
+            _containerBuilder.AddConsumerService<ICommand>();
+            _containerBuilder.AddConsumerService<IEvent>();
 
             // Assert
             var contaier = _containerBuilder.Build();
