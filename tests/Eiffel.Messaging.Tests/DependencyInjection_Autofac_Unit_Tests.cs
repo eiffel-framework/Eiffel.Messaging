@@ -27,6 +27,7 @@ namespace Eiffel.Messaging.Tests
         private readonly Mock<IMessageSerializer> _mockMessageSerializer;
         private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<IMessageBus> _mockMessageBus;
+        private readonly Mock<IEventBus> _mockEventBus;
         private readonly IConfiguration _mockValidConfiguration;
         private readonly IConfiguration _mockInvalidConfiguraton;
 
@@ -43,6 +44,8 @@ namespace Eiffel.Messaging.Tests
             _mockMediator = new Mock<IMediator>();
 
             _mockMessageBus = new Mock<IMessageBus>();
+
+            _mockEventBus = new Mock<IEventBus>();
 
             var config = new Dictionary<string, string>
             {
@@ -269,6 +272,8 @@ namespace Eiffel.Messaging.Tests
             // Arrange
             _containerBuilder.RegisterInstance(_mockMessageBus.Object);
 
+            _containerBuilder.RegisterInstance(_mockEventBus.Object);
+
             // Act
             _containerBuilder.AddConsumerService<MockMessage>();
 
@@ -285,6 +290,8 @@ namespace Eiffel.Messaging.Tests
         {
             // Arrange
             _containerBuilder.RegisterInstance(_mockMessageBus.Object);
+
+            _containerBuilder.RegisterInstance(_mockEventBus.Object);
 
             // Act
             _containerBuilder.AddConsumerService<IMessage>();

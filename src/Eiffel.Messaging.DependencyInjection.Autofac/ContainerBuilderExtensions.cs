@@ -97,7 +97,7 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
         /// <seealso cref="ICommand"/>
         /// <seealso cref="IEvent"/>
         /// </summary>
-        public static ContainerBuilder RegisterMessages<T>(this ContainerBuilder builder, Assembly[] assemblies)
+        public static ContainerBuilder RegisterMessages<T>(this ContainerBuilder builder, params Assembly[] assemblies)
         {
             var messageTypes = GetMessageTypesFromAssemblies<T>(assemblies);
 
@@ -113,6 +113,24 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
                 });
 
             });
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers message
+        /// <see cref="MessageAttribute"/>
+        /// </summary>
+        public static ContainerBuilder RegisterMessage<T>(this ContainerBuilder builder)
+        {
+            builder.RegisterBuildCallback(lifetimeScope =>
+            {
+                var registry = lifetimeScope.Resolve<IMessageRegistry>();
+
+                var messageType = typeof(T);
+
+                registry.Register(typeof(T), messageType.GetCustomAttribute<MessageAttribute>().GetMetadata());
+            });
+
             return builder;
         }
 
@@ -183,8 +201,8 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
             where TMessage : class
         {
             builder.RegisterType<ConsumerService<TMessage>>()
-                   .As<IHostedService>()
-                   .InstancePerDependency();
+                   .InstancePerDependency()
+                   .As<IHostedService>();
 
             return builder;
         }
@@ -195,7 +213,6 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
         /// </summary>
         public static ContainerBuilder AddConsumerServices<T>(this ContainerBuilder builder, Assembly[] assemblies)
         {
-
             var messageTypes = GetMessageTypesFromAssemblies<T>(assemblies);
 
             messageTypes.ForEach(messageType =>

@@ -5,36 +5,54 @@ using Moq;
 using Xunit;
 
 using Eiffel.Messaging.Abstractions;
+using System;
+using FluentAssertions;
 
 namespace Eiffel.Messaging.Tests
 {
     public class ConsumerService_Unit_Tests
     {
         private readonly Mock<IMessageBus> _mockMessageBus;
-
-        private readonly ConsumerService<MockMessage> _consumerService;
+        private readonly Mock<IEventBus> _mockEventBus;
 
         public ConsumerService_Unit_Tests()
         {
             _mockMessageBus = new Mock<IMessageBus>();
-
-            _consumerService = new ConsumerService<MockMessage>(_mockMessageBus.Object);
-
+            _mockEventBus = new Mock<IEventBus>();
         }
 
-        [Fact]
-        public async Task ConsumerService_Should_ConsumeMessages_When_Service_Started()
+        [Theory]
+        [InlineData(typeof(MockEvent))]
+        [InlineData(typeof(MockCommand))]
+        [InlineData(typeof(MockMessage))]
+        public async Task ConsumerService_Should_Consume_When_Service_Started(Type messageType)
         {
             // Arrange
-            _mockMessageBus.Setup(x => x.SubscribeAsync<MockMessage>(It.IsAny<CancellationToken>()));
+            var isCalled = false;
+
+            var tokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
+
+            var serviceType = typeof(ConsumerService<>).MakeGenericType(messageType);
+
+            var consumerService = Activator.CreateInstance(serviceType, new object[] { _mockMessageBus.Object, _mockEventBus.Object });
+
+            _mockMessageBus.Setup(x => x.SubscribeAsync<object>(It.IsAny<CancellationToken>())).Callback(() =>
+            {
+                isCalled = true;
+            });
+            
+            _mockEventBus.Setup(x => x.SubscribeAsync<object>(It.IsAny<CancellationToken>())).Callback(() => 
+            {
+                isCalled = true;
+            });
+
+            var executeMethod = serviceType.GetMethod("ExecuteAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
             // Act
-            await _consumerService.StartAsync(default);
-
-            await Task.Delay(3000);
+            await ((Task)executeMethod.Invoke(consumerService, new object[] { tokenSource.Token }));
 
             // Assert
-            _mockMessageBus.Verify(x => x.SubscribeAsync<MockMessage>(It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+            isCalled.Should().Be(true);
         }
     }
 }

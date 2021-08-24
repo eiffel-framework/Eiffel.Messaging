@@ -12,10 +12,12 @@ namespace Eiffel.Messaging
         where TMessage : class
     {
         private readonly IMessageBus _messageBus;
+        private readonly IEventBus _eventBus;
 
-        public ConsumerService(IMessageBus messageBus)
+        public ConsumerService(IMessageBus messageBus, IEventBus eventBus)
         {
             _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
+            _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -25,11 +27,20 @@ namespace Eiffel.Messaging
                 while (true)
                 {
                     if (stoppingToken.IsCancellationRequested)
+                    {
                         break;
+                    }
 
-                    await _messageBus.SubscribeAsync<TMessage>(stoppingToken);
+                    if (typeof(TMessage).IsAssignableTo(typeof(IEvent)))
+                    {
+                        await _eventBus.SubscribeAsync<TMessage>(stoppingToken);
+                    }
+                    else
+                    {
+                        await _messageBus.SubscribeAsync<TMessage>(stoppingToken);
+                    }
                 }
-            }).ConfigureAwait(false);
+            });
         }
     }
 }
