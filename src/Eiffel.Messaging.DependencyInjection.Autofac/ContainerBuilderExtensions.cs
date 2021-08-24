@@ -66,7 +66,7 @@ namespace Eiffel.Messaging.DependencyInjection.Autofac
         /// </summary>
         /// <typeparam name="TSerializer">Custom IMessageSerializer implementation</typeparam>
         public static ContainerBuilder AddMessageSerializer<TSerializer>(this ContainerBuilder builder)
-            where TSerializer : IMessageSerializer
+            where TSerializer : class, IMessageSerializer
         {
             builder.RegisterType<TSerializer>()
                .As<IMessageSerializer>()

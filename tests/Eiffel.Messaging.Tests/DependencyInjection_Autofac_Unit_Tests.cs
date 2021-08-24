@@ -89,10 +89,41 @@ namespace Eiffel.Messaging.Tests
         }
 
         [Fact]
+        public void RegisterMessage_Should_Register_Message()
+        {
+            // Arrange
+            _containerBuilder.AddMessageRegistry();
+
+            // Act
+            _containerBuilder.RegisterMessage<MockMessage>();
+
+            // Assert
+            var container = _containerBuilder.Build();
+
+            var registry = container.Resolve<IMessageRegistry>();
+
+            registry.GetRoute<MockMessage>().Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
         public void AddMessageSerializer_Should_Register_MessageSerializer_As_IMessageSerializer()
         {
             // Act
             _containerBuilder.AddMessageSerializer();
+
+            // Assert
+            var container = _containerBuilder.Build();
+
+            container.IsRegistered<IMessageSerializer>().Should().Be(true);
+
+            container.Resolve<IMessageSerializer>();
+        }
+
+        [Fact]
+        public void AddMessageSerializer_Should_Register_CustomMessageSerializer_As_IMessageSerializer()
+        {
+            // Act
+            _containerBuilder.AddMessageSerializer<MockMessageSerializer>();
 
             // Assert
             var container = _containerBuilder.Build();
@@ -293,10 +324,12 @@ namespace Eiffel.Messaging.Tests
 
             _containerBuilder.RegisterInstance(_mockEventBus.Object);
 
+            var assemblies = new[] { Assembly.GetExecutingAssembly() };
+
             // Act
-            _containerBuilder.AddConsumerService<IMessage>();
-            _containerBuilder.AddConsumerService<ICommand>();
-            _containerBuilder.AddConsumerService<IEvent>();
+            _containerBuilder.AddConsumerServices<IMessage>(assemblies);
+            _containerBuilder.AddConsumerServices<ICommand>(assemblies);
+            _containerBuilder.AddConsumerServices<IEvent>(assemblies);
 
             // Assert
             var contaier = _containerBuilder.Build();

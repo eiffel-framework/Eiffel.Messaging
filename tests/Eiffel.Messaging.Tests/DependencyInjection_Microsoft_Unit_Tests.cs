@@ -29,7 +29,6 @@ namespace Eiffel.Messaging.Tests
         private readonly IConfiguration _mockValidConfiguration;
         private readonly IConfiguration _mockInvalidConfiguraton;
 
-
         public DependencyInjection_Microsoft_Unit_Tests()
         {
             _services = new ServiceCollection();
@@ -55,18 +54,6 @@ namespace Eiffel.Messaging.Tests
         }
 
         [Fact]
-        public void AddMessageSerializer_Should_Register_MessageSerializer_As_IMessageSerializer()
-        {
-            // Act
-            _services.AddMessageSerializer();
-
-            // Assert
-            var serviceProvider = _services.BuildServiceProvider();
-
-            serviceProvider.GetService<IMessageSerializer>().Should().NotBeNull();
-        }
-
-        [Fact]
         public void AddMediator_Should_Register_Mediator_As_IMediator()
         {
             // Act
@@ -76,6 +63,22 @@ namespace Eiffel.Messaging.Tests
             var serviceProvider = _services.BuildServiceProvider();
 
             serviceProvider.GetService<IMediator>().Should().NotBeNull();
+        }
+
+        [Fact]
+        public void AddMediator_Should_Register_Pipelines()
+        {
+            // Act
+            _services.AddMediator();
+
+            // Assert
+            var serviceProvider = _services.BuildServiceProvider();
+
+            serviceProvider.GetService<IMediator>().Should().NotBeNull();
+
+            serviceProvider.GetService<IPipelinePreProcessor>().Should().NotBeNull();
+
+            serviceProvider.GetService<IPipelinePostProcessor>().Should().NotBeNull();
         }
 
         [Fact]
@@ -100,19 +103,68 @@ namespace Eiffel.Messaging.Tests
         }
 
         [Fact]
-        public void AddMediator_Should_Register_Pipelines()
+        public void RegisterMessages_Should_Register_Messages()
         {
+            // Arrange
+            _services.AddMessageRegistry();
+
+            var assemblies = new[] { Assembly.GetExecutingAssembly() };
+
             // Act
-            _services.AddMediator();
+            _services.RegisterMessages<IMessage>(assemblies);
+            _services.RegisterMessages<ICommand>(assemblies);
+            _services.RegisterMessages<IEvent>(assemblies);
 
             // Assert
             var serviceProvider = _services.BuildServiceProvider();
 
-            serviceProvider.GetService<IMediator>().Should().NotBeNull();
+            var registry = serviceProvider.GetService<IMessageRegistry>();
 
-            serviceProvider.GetService<IPipelinePreProcessor>().Should().NotBeNull();
+            registry.Get<MockMessage>().Route.Should().NotBeNullOrWhiteSpace();
+            registry.Get<MockCommand>().Route.Should().NotBeNullOrWhiteSpace();
+            registry.Get<MockEvent>().Route.Should().NotBeNullOrWhiteSpace();
+        }
 
-            serviceProvider.GetService<IPipelinePostProcessor>().Should().NotBeNull();
+        [Fact]
+        public void RegisterMessage_Should_Register_Message()
+        {
+            // Arrange
+            _services.AddMessageRegistry();
+
+
+            // Act
+            _services.RegisterMessage<MockMessage>();
+
+            // Assert
+            var serviceProvider = _services.BuildServiceProvider();
+
+            var registry = serviceProvider.GetService<IMessageRegistry>();
+
+            registry.Get<MockMessage>().Route.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public void AddMessageSerializer_Should_Register_MessageSerializer_As_IMessageSerializer()
+        {
+            // Act
+            _services.AddMessageSerializer();
+
+            // Assert
+            var serviceProvider = _services.BuildServiceProvider();
+
+            serviceProvider.GetService<IMessageSerializer>().Should().NotBeNull();
+        }
+
+        [Fact]
+        public void AddMessageSerializer_Should_Register_CustomMessageSerializer_As_IMessageSerializer()
+        {
+            // Act
+            _services.AddMessageSerializer<MockMessageSerializer>();
+
+            // Assert
+            var serviceProvider = _services.BuildServiceProvider();
+
+            serviceProvider.GetService<IMessageSerializer>().Should().NotBeNull();
         }
 
         [Fact]
